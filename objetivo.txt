@@ -1,0 +1,308 @@
+project/
+│
+├── README.md
+├── ARCH.md
+├── req.txt
+├── docker-compose.yml
+│
+├── data/
+│   ├── raw/
+│   ├── proc/
+│   └── feat/
+│
+├── nb/
+│   ├── 01_explore.ipynb
+│   ├── 02_eda.ipynb
+│   ├── 03_feat.ipynb
+│   └── 04_model.ipynb
+│
+├── src/
+│   ├── etl/
+│   │   ├── ext.py
+│   │   ├── trf.py
+│   │   └── ld.py
+│   │
+│   ├── ml/
+│   │   ├── train.py
+│   │   ├── eval.py
+│   │   └── pred.py
+│   │
+│   └── util/
+│       └── helper.py
+│
+├── dags/
+│   └── etl_ml.py
+│
+├── models/
+│   └── model.pkl
+│
+├── tests/
+│   ├── test_trf.py
+│   └── test_ml.py
+│
+└── res/
+    ├── metrics.json
+    └── plots/
+
+Perfecto. Aquí lo tienes convertido a semanas, muy concreto, sabiendo que ya dominas Python y SQL básico.
+Esto es literalmente un plan ejecutable: sabes cada semana qué haces, con qué, y qué subes a GitHub.
+
+⸻
+
+🗓️ PLAN SEMANAL — DATA ENGINEER + DATA SCIENCE
+
+⏱️ Dedicación: 1–2 h/día
+🎯 Objetivo final: pipeline real + Airflow + EDA + ML
+
+⸻
+
+🟦 SEMANA 1 — ETL BÁSICO (sin Airflow)
+
+🎯 Objetivo
+
+Construir tu primer pipeline real.
+
+⸻
+
+🔧 Qué haces
+	•	Elegir una API pública (clima, crypto, fútbol…)
+	•	Extraer datos
+	•	Limpiar datos
+	•	Guardarlos en PostgreSQL
+
+⸻
+
+🛠️ Con qué
+	•	Python
+	•	requests
+	•	Pandas
+	•	PostgreSQL
+	•	SQLAlchemy
+
+⸻
+
+📁 Estructura
+
+project-etl/
+├── extract.py
+├── transform.py
+├── load.py
+├── config.py
+└── README.md
+
+
+⸻
+
+📌 Resultado
+
+✔️ ETL funcional
+✔️ Tabla creada en PostgreSQL
+✔️ Repo subido a GitHub
+
+⸻
+
+🟨 SEMANA 2 — ETL LIMPIO Y ROBUSTO
+
+🎯 Objetivo
+
+Que tu ETL parezca de empresa.
+
+⸻
+
+🔧 Qué haces
+	•	Modularizar código
+	•	Añadir logging
+	•	Manejar errores
+	•	Validar datos
+
+⸻
+
+🛠️ Con qué
+	•	logging
+	•	try/except
+	•	Validaciones en Pandas
+
+⸻
+
+📌 Resultado
+
+✔️ Código limpio
+✔️ Logs claros
+✔️ README técnico
+
+⸻
+
+🟧 SEMANA 3 — DOCKER + POSTGRES
+
+🎯 Objetivo
+
+Ejecutar tu ETL en cualquier sitio.
+
+⸻
+
+🔧 Qué haces
+	•	Dockerizar ETL
+	•	Dockerizar PostgreSQL
+	•	Usar docker-compose
+
+⸻
+
+🛠️ Con qué
+	•	Docker
+	•	docker-compose
+
+⸻
+
+📌 Resultado
+
+✔️ docker-compose up
+✔️ Todo funciona solo
+✔️ Repo actualizado
+
+⸻
+
+🟨 SEMANA 4 — AIRFLOW (ORQUESTACIÓN REAL)
+
+🎯 Objetivo
+
+Automatizar el pipeline.
+
+⸻
+
+🔧 Qué haces
+	•	Crear un DAG
+	•	Definir tareas
+	•	Programar ejecución diaria
+	•	Añadir reintentos
+
+⸻
+
+🛠️ Con qué
+	•	Apache Airflow
+	•	PythonOperators
+
+⸻
+
+📁 Estructura
+
+project-airflow/
+├── dags/
+│   └── etl_dag.py
+├── extract.py
+├── transform.py
+├── load.py
+└── docker-compose.yml
+
+
+⸻
+
+📌 Resultado
+
+✔️ DAG funcionando
+✔️ Logs visibles
+✔️ Historial de ejecuciones
+
+⸻
+
+🟩 SEMANA 5 — DATA WAREHOUSE + SQL AVANZADO
+
+🎯 Objetivo
+
+Pensar como empresa.
+
+⸻
+
+🔧 Qué haces
+	•	Diseñar esquema estrella
+	•	Crear tablas de hechos y dimensiones
+	•	Queries analíticas
+
+⸻
+
+🛠️ Con qué
+	•	PostgreSQL
+	•	SQL avanzado
+
+⸻
+
+📌 Resultado
+
+✔️ Modelo bien diseñado
+✔️ Queries defendibles
+✔️ Repo o carpeta nueva
+
+⸻
+
+🟦 SEMANA 6 — EDA (DATA SCIENCE REAL)
+
+🎯 Objetivo
+
+Extraer valor de tus datos.
+
+⸻
+
+🔧 Qué haces
+	•	Cargar datos desde PostgreSQL
+	•	Análisis exploratorio
+	•	Visualizaciones
+	•	Conclusiones
+
+⸻
+
+🛠️ Con qué
+	•	Pandas
+	•	Matplotlib / Seaborn
+
+⸻
+
+📌 Resultado
+
+✔️ Notebook claro
+✔️ Conclusiones escritas
+✔️ Repo eda-project
+
+⸻
+
+🟪 SEMANA 7 — MACHINE LEARNING SIMPLE
+
+🎯 Objetivo
+
+Modelo sencillo pero profesional.
+
+⸻
+
+🔧 Qué haces
+	•	Preparar dataset
+	•	Entrenar modelo
+	•	Evaluar resultados
+
+⸻
+
+🛠️ Con qué
+	•	Scikit-learn
+
+⸻
+
+📌 Resultado
+
+✔️ Modelo funcional
+✔️ Métricas explicadas
+✔️ Repo ml-project
+
+⸻
+
+🟥 SEMANA 8 — PROYECTO FINAL 🔥
+
+🎯 Objetivo
+
+Unir todo.
+
+⸻
+
+🔧 Qué haces
+	•	Pipeline automatizado
+	•	Datos históricos
+	•	Modelo entrenado
+	•	Visualización final
+
+⸻
