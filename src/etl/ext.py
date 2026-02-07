@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 
 # Carpeta donde guardar los CSV
-output_folder = Path("/mnt/c/Users/juanm/etl/Pipeline-ETL-ML/src/data/entry")
+output_folder = Path("/home/juanto/etl/Pipeline-ETL-ML/src/data/entry")
 
 # Lista de activos
 stocks = ["AAPL", "TSLA", "MSFT"]
