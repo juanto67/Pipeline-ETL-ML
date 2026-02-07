@@ -3,15 +3,14 @@ import yfinance as yf
 import pandas as pd
 from pathlib import Path
 
-# Carpeta donde guardar los CSV
-output_folder = Path("/home/juanto/etl/Pipeline-ETL-ML/src/data/entry")
+
 
 # Lista de activos
 stocks = ["AAPL", "TSLA", "MSFT"]
 forex = ["EURUSD=X", "GBPUSD=X", "JPY=X"]
 crypto = ["BTC-USD", "ETH-USD"]
 
-def fetch_and_save(symbols, interval="1d", asset_type="stocks"):
+def fetch_and_save(symbols, interval="1d", asset_type="stocks",output_folder=Path(__file__).resolve().parents[1] / "data" / "entry"):
     filename = output_folder / f"{asset_type}.csv"
     for symbol in symbols:
         ticker = yf.Ticker(symbol)
@@ -30,16 +29,18 @@ def fetch_and_save(symbols, interval="1d", asset_type="stocks"):
 
 def __main__():
     
-    # Carpeta donde guardar los CSV
-    output_folder = Path("/mnt/c/Users/juanm/etl/Pipeline-ETL-ML/src/data/entry")
 
     # Lista de activos
     stocks = ["AAPL", "TSLA", "MSFT"]
     forex = ["EURUSD=X", "GBPUSD=X", "JPY=X"]
     crypto = ["BTC-USD", "ETH-USD"]
-    
+    output_folder=Path(__file__).resolve().parents[1] / "data" / "entry"
+    print(f"Guardando datos en: {output_folder}")
     
     # Ejecutar ETL
     fetch_and_save(stocks, interval="1d", asset_type="stocks")
     fetch_and_save(forex, interval="1d", asset_type="forex")
     fetch_and_save(crypto, interval="1d", asset_type="crypto")
+
+if __name__ == "__main__":
+    __main__()
