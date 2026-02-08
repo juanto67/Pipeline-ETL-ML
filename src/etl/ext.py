@@ -3,14 +3,30 @@ import yfinance as yf
 import pandas as pd
 from pathlib import Path
 import os
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+
+logger = logging.getLogger(__name__)
 
 def fetch_and_save(symbols, asset_type, output_folder, interval="1d"):
     filename = output_folder / f"{asset_type}.csv"
 
+    logger.info("Starting %s fetch (%s symbols)", asset_type, len(symbols))
+
     for symbol in symbols:
-        ticker = yf.Ticker(symbol)
-        data = ticker.history(period="60d", interval=interval)
+        logger.info("Fetching %s", symbol)
+        try:
+            ticker = yf.Ticker(symbol)
+            data = ticker.history(period="60d", interval=interval)
+        except Exception:
+            logger.exception("Failed to fetch %s", symbol)
+            continue
         if data.empty:
+            logger.warning("No data for %s", symbol)
             continue
         data = data.reset_index().rename(columns={"index": "Date"})
         data["Date"] = pd.to_datetime(data["Date"], errors="coerce", utc=True).dt.normalize()
@@ -30,6 +46,7 @@ def fetch_and_save(symbols, asset_type, output_folder, interval="1d"):
         combined["Date"] = pd.to_datetime(combined["Date"], errors="coerce", utc=True)
         combined["Date"] = combined["Date"].dt.tz_localize(None).dt.strftime("%Y-%m-%d")
         combined.to_csv(filename, index=False)
+        logger.info("Saved %s rows to %s", len(combined), filename)
 
 def __main__():
     # Lista de activos
@@ -37,7 +54,7 @@ def __main__():
     forex = ["EURUSD=X", "GBPUSD=X", "JPY=X"]
     crypto = ["BTC-USD", "ETH-USD"]
     output_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
-    
+    logger.info("Output folder: %s", output_folder)
     # Ejecutar ETL
     fetch_and_save(stocks, asset_type="stocks", output_folder=output_folder, interval="1d")
     fetch_and_save(forex, asset_type="forex", output_folder=output_folder, interval="1d")

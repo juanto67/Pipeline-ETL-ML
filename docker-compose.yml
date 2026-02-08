@@ -5,6 +5,7 @@ services:
     depends_on:
       - postgres
     volumes:
+      - ./src:/app/src
       - ./src/data:/app/src/data
     restart: "no"
 
