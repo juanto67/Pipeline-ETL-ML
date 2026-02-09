@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import logging
-import os
-import time
-from datetime import date, timedelta
+from datetime import date
+from io import StringIO
 from pathlib import Path
 
 import pandas as pd
@@ -15,114 +14,156 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-API_BASE = "https://api.football-data.org/v4"
-REQUEST_DELAY_SECONDS = 1.0
-DEFAULT_LOOKBACK_DAYS = 730
+DATA_BASE = "https://www.football-data.co.uk/mmz4281"
+DEFAULT_SEASONS_BACK = 3
+DIVISION = "SP1"
 
 
-def get_api_key():
-    api_key = os.getenv("FOOTBALL_DATA_API_KEY", "").strip()
-    if not api_key:
-        logger.error("Missing FOOTBALL_DATA_API_KEY environment variable.")
-        return None
-    return api_key
+def build_season_codes(seasons_back=DEFAULT_SEASONS_BACK, today=None):
+    if today is None:
+        today = date.today()
+    current_start_year = today.year if today.month >= 7 else today.year - 1
+    codes = []
+    for offset in range(1, seasons_back + 1):
+        start_year = current_start_year - offset
+        end_year = start_year + 1
+        codes.append(f"{start_year % 100:02d}{end_year % 100:02d}")
+    return codes
 
 
-def fetch_json(endpoint, api_key, params=None, max_retries=3):
-    headers = {"X-Auth-Token": api_key}
-    url = f"{API_BASE}{endpoint}"
-
-    for attempt in range(1, max_retries + 1):
-        try:
-            response = requests.get(url, headers=headers, params=params, timeout=30)
-            if response.status_code == 429:
-                retry_after = response.headers.get("Retry-After")
-                wait_seconds = int(retry_after) if retry_after and retry_after.isdigit() else 10
-                logger.warning("Rate limit hit. Waiting %s seconds.", wait_seconds)
-                time.sleep(wait_seconds)
-                continue
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException:
-            logger.exception("Request failed (%s/%s): %s", attempt, max_retries, url)
-            time.sleep(2)
-    return None
+def fetch_season_csv(season_code, division=DIVISION):
+    url = f"{DATA_BASE}/{season_code}/{division}.csv"
+    try:
+        response = requests.get(url, timeout=30)
+        if response.status_code == 404:
+            logger.warning("Season not found: %s", url)
+            return None, url
+        response.raise_for_status()
+        return response.text, url
+    except requests.RequestException:
+        logger.exception("Failed to fetch %s", url)
+        return None, url
 
 
-def list_european_competitions(api_key):
-    payload = fetch_json("/competitions", api_key=api_key)
-    if not payload:
-        return []
-    competitions = []
-    for item in payload.get("competitions", []):
-        area = item.get("area", {})
-        if area.get("parentArea") == "Europe" or area.get("name") == "Europe":
-            competitions.append(item)
-    return competitions
+def normalize_matches(raw_df, season_code, division, source_url):
+    required_cols = {"Date", "HomeTeam", "AwayTeam"}
+    if not required_cols.issubset(raw_df.columns):
+        logger.warning("Missing required columns in %s", source_url)
+        return pd.DataFrame()
+
+    df = raw_df.rename(
+        columns={
+            "Date": "match_date",
+            "HomeTeam": "home_team",
+            "AwayTeam": "away_team",
+            "FTHG": "home_score",
+            "FTAG": "away_score",
+            "FTR": "result",
+            "HTHG": "home_score_ht",
+            "HTAG": "away_score_ht",
+            "HTR": "result_ht",
+        }
+    )
+
+    df["match_date"] = (
+        pd.to_datetime(df["match_date"], errors="coerce", dayfirst=True)
+        .dt.strftime("%Y-%m-%d")
+    )
+    df = df.dropna(subset=["match_date", "home_team", "away_team"])
+
+    for col in ["home_score", "away_score", "home_score_ht", "away_score_ht"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    df["season_code"] = season_code
+    df["division"] = division
+    df["source_url"] = source_url
+    df["match_id"] = (
+        df["season_code"].astype(str)
+        + "-"
+        + df["division"].astype(str)
+        + "-"
+        + df["match_date"].astype(str)
+        + "-"
+        + df["home_team"].astype(str)
+        + "-"
+        + df["away_team"].astype(str)
+    )
+
+    columns = [
+        "match_id",
+        "season_code",
+        "division",
+        "match_date",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "result",
+        "home_score_ht",
+        "away_score_ht",
+        "result_ht",
+        "source_url",
+    ]
+    existing_cols = [col for col in columns if col in df.columns]
+    return df[existing_cols]
 
 
-def build_match_rows(competition, matches):
-    rows = []
-    for match in matches:
-        season = match.get("season") or {}
-        score = match.get("score", {})
-        full_time = score.get("fullTime", {})
-        home_team = match.get("homeTeam", {})
-        away_team = match.get("awayTeam", {})
-        rows.append(
-            {
-                "competition_id": competition.get("id"),
-                "competition_name": competition.get("name"),
-                "season_id": season.get("id"),
-                "season_start": season.get("startDate"),
-                "season_end": season.get("endDate"),
-                "match_id": match.get("id"),
-                "utc_date": match.get("utcDate"),
-                "status": match.get("status"),
-                "matchday": match.get("matchday"),
-                "stage": match.get("stage"),
-                "group": match.get("group"),
-                "home_team_id": home_team.get("id"),
-                "home_team": home_team.get("name"),
-                "away_team_id": away_team.get("id"),
-                "away_team": away_team.get("name"),
-                "home_score": full_time.get("home"),
-                "away_score": full_time.get("away"),
-                "winner": score.get("winner"),
-            }
-        )
-    return rows
+def build_standings(matches_df):
+    if matches_df.empty:
+        return pd.DataFrame()
 
-def build_standing_rows(competition, standings, season):
-    rows = []
-    for standing in standings:
-        for entry in standing.get("table", []):
-            team = entry.get("team", {})
-            rows.append(
-                {
-                    "competition_id": competition.get("id"),
-                    "competition_name": competition.get("name"),
-                    "season_id": season.get("id"),
-                    "season_start": season.get("startDate"),
-                    "season_end": season.get("endDate"),
-                    "stage": standing.get("stage"),
-                    "type": standing.get("type"),
-                    "group": standing.get("group"),
-                    "position": entry.get("position"),
-                    "team_id": team.get("id"),
-                    "team_name": team.get("name"),
-                    "played": entry.get("playedGames"),
-                    "won": entry.get("won"),
-                    "draw": entry.get("draw"),
-                    "lost": entry.get("lost"),
-                    "points": entry.get("points"),
-                    "goals_for": entry.get("goalsFor"),
-                    "goals_against": entry.get("goalsAgainst"),
-                    "goal_diff": entry.get("goalDifference"),
-                    "form": entry.get("form"),
-                }
-            )
-    return rows
+    matches_df = matches_df.dropna(subset=["home_score", "away_score"])
+    if matches_df.empty:
+        return pd.DataFrame()
+
+    home = matches_df.assign(
+        team=matches_df["home_team"],
+        goals_for=matches_df["home_score"],
+        goals_against=matches_df["away_score"],
+        won=(matches_df["home_score"] > matches_df["away_score"]).astype(int),
+        draw=(matches_df["home_score"] == matches_df["away_score"]).astype(int),
+        lost=(matches_df["home_score"] < matches_df["away_score"]).astype(int),
+    )[["season_code", "division", "team", "goals_for", "goals_against", "won", "draw", "lost"]]
+
+    away = matches_df.assign(
+        team=matches_df["away_team"],
+        goals_for=matches_df["away_score"],
+        goals_against=matches_df["home_score"],
+        won=(matches_df["away_score"] > matches_df["home_score"]).astype(int),
+        draw=(matches_df["away_score"] == matches_df["home_score"]).astype(int),
+        lost=(matches_df["away_score"] < matches_df["home_score"]).astype(int),
+    )[["season_code", "division", "team", "goals_for", "goals_against", "won", "draw", "lost"]]
+
+    totals = pd.concat([home, away], ignore_index=True)
+    grouped = totals.groupby(["season_code", "division", "team"], as_index=False).sum(numeric_only=True)
+    grouped["played"] = grouped["won"] + grouped["draw"] + grouped["lost"]
+    grouped["goal_diff"] = grouped["goals_for"] - grouped["goals_against"]
+    grouped["points"] = grouped["won"] * 3 + grouped["draw"]
+
+    grouped = grouped.sort_values(
+        ["season_code", "division", "points", "goal_diff", "goals_for", "team"],
+        ascending=[True, True, False, False, False, True],
+    )
+    grouped["position"] = grouped.groupby(["season_code", "division"]).cumcount() + 1
+    grouped = grouped.rename(columns={"team": "team_name"})
+
+    return grouped[
+        [
+            "season_code",
+            "division",
+            "position",
+            "team_name",
+            "played",
+            "won",
+            "draw",
+            "lost",
+            "points",
+            "goals_for",
+            "goals_against",
+            "goal_diff",
+        ]
+    ]
 
 
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
@@ -137,71 +178,39 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
     logger.info("Saved %s rows to %s", len(combined), filename)
 
 
-def fetch_matches_and_standings(output_folder, lookback_days=DEFAULT_LOOKBACK_DAYS):
-    api_key = get_api_key()
-    if not api_key:
-        return
+def fetch_spain_matches_and_standings(output_folder, seasons_back=DEFAULT_SEASONS_BACK):
+    output_folder.mkdir(parents=True, exist_ok=True)
+    season_codes = build_season_codes(seasons_back=seasons_back)
+    logger.info("Fetching Spain %s for seasons: %s", DIVISION, ", ".join(season_codes))
 
-
-
-    competitions = list_european_competitions(api_key)
-    logger.info("Found %s European competitions", len(competitions))
-
-    date_to = date.today()
-    date_from = date_to - timedelta(days=lookback_days)
-    date_from_str = date_from.isoformat()
-    date_to_str = date_to.isoformat()
-
-    match_rows = []
-    standing_rows = []
-
-    for competition in competitions:
-        competition_id = competition.get("id")
-        if not competition_id:
+    match_frames = []
+    for season_code in season_codes:
+        csv_text, source_url = fetch_season_csv(season_code)
+        if not csv_text:
             continue
+        raw_df = pd.read_csv(StringIO(csv_text))
+        normalized = normalize_matches(raw_df, season_code, DIVISION, source_url)
+        if not normalized.empty:
+            match_frames.append(normalized)
 
-        logger.info("Fetching matches for %s", competition.get("name"))
-        matches_payload = fetch_json(
-            f"/competitions/{competition_id}/matches",
-            api_key=api_key,
-            params={"dateFrom": date_from_str, "dateTo": date_to_str},
-        )
-        if matches_payload:
-            match_rows.extend(build_match_rows(competition, matches_payload.get("matches", [])))
-
-        time.sleep(REQUEST_DELAY_SECONDS)
-
-        logger.info("Fetching standings for %s", competition.get("name"))
-        standings_payload = fetch_json(
-            f"/competitions/{competition_id}/standings",
-            api_key=api_key,
-        )
-        if standings_payload:
-            standings_season = standings_payload.get("season") or {}
-            standing_rows.extend(
-                build_standing_rows(competition, standings_payload.get("standings", []), standings_season)
-            )
-
-        time.sleep(REQUEST_DELAY_SECONDS)
-
-    if match_rows:
-        matches_df = pd.DataFrame(match_rows)
+    matches_df = pd.concat(match_frames, ignore_index=True) if match_frames else pd.DataFrame()
+    if not matches_df.empty:
         merge_and_save(
             matches_df,
             output_folder / "matches.csv",
             dedupe_keys=["match_id"],
-            sort_keys=["utc_date", "competition_id", "match_id"],
+            sort_keys=["season_code", "match_date", "home_team", "away_team"],
         )
     else:
         logger.warning("No match data collected.")
 
-    if standing_rows:
-        standings_df = pd.DataFrame(standing_rows)
+    standings_df = build_standings(matches_df)
+    if not standings_df.empty:
         merge_and_save(
             standings_df,
             output_folder / "standings.csv",
-            dedupe_keys=["competition_id", "season_id", "stage", "group", "type", "position", "team_id"],
-            sort_keys=["competition_id", "season_id", "stage", "type", "group", "position"],
+            dedupe_keys=["season_code", "division", "team_name"],
+            sort_keys=["season_code", "division", "position"],
         )
     else:
         logger.warning("No standings data collected.")
@@ -210,7 +219,7 @@ def fetch_matches_and_standings(output_folder, lookback_days=DEFAULT_LOOKBACK_DA
 def __main__():
     output_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
     logger.info("Output folder: %s", output_folder)
-    fetch_matches_and_standings(output_folder, lookback_days=DEFAULT_LOOKBACK_DAYS)
+    fetch_spain_matches_and_standings(output_folder, seasons_back=DEFAULT_SEASONS_BACK)
 
 
 if __name__ == "__main__":
