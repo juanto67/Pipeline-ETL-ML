@@ -93,7 +93,6 @@ def build_match_rows(competition, matches):
         )
     return rows
 
-
 def build_standing_rows(competition, standings, season):
     rows = []
     for standing in standings:
