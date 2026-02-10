@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import time
 from datetime import date
 from io import StringIO
 from pathlib import Path
@@ -15,11 +16,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DATA_BASE = "https://www.football-data.co.uk/mmz4281"
-DEFAULT_SEASONS_BACK = 3
-DIVISION = "SP1"
+REQUEST_DELAY_SECONDS = 0.2
+SEASONS_BACK = 10
+
+LEAGUES = {
+    "La Liga": "SP1",
+    "Premier League": "E0",
+    "Ligue 1": "F1",
+}
 
 
-def build_season_codes(seasons_back=DEFAULT_SEASONS_BACK, today=None):
+def build_season_codes(seasons_back=SEASONS_BACK, today=None):
     if today is None:
         today = date.today()
     current_start_year = today.year if today.month >= 7 else today.year - 1
@@ -31,7 +38,7 @@ def build_season_codes(seasons_back=DEFAULT_SEASONS_BACK, today=None):
     return codes
 
 
-def fetch_season_csv(season_code, division=DIVISION):
+def fetch_season_csv(season_code, division):
     url = f"{DATA_BASE}/{season_code}/{division}.csv"
     try:
         response = requests.get(url, timeout=30)
@@ -45,7 +52,7 @@ def fetch_season_csv(season_code, division=DIVISION):
         return None, url
 
 
-def normalize_matches(raw_df, season_code, division, source_url):
+def normalize_matches(raw_df, season_code, league_name, division, source_url):
     required_cols = {"Date", "HomeTeam", "AwayTeam"}
     if not required_cols.issubset(raw_df.columns):
         logger.warning("Missing required columns in %s", source_url)
@@ -65,10 +72,12 @@ def normalize_matches(raw_df, season_code, division, source_url):
         }
     )
 
-    df["match_date"] = (
-        pd.to_datetime(df["match_date"], errors="coerce", dayfirst=True)
-        .dt.strftime("%Y-%m-%d")
-    )
+    parsed_dates = pd.to_datetime(df["match_date"], errors="coerce", format="%d/%m/%y")
+    if parsed_dates.isna().any():
+        parsed_dates = parsed_dates.fillna(
+            pd.to_datetime(df["match_date"], errors="coerce", format="%d/%m/%Y")
+        )
+    df["match_date"] = parsed_dates.dt.strftime("%Y-%m-%d")
     df = df.dropna(subset=["match_date", "home_team", "away_team"])
 
     for col in ["home_score", "away_score", "home_score_ht", "away_score_ht"]:
@@ -76,6 +85,7 @@ def normalize_matches(raw_df, season_code, division, source_url):
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     df["season_code"] = season_code
+    df["league_name"] = league_name
     df["division"] = division
     df["source_url"] = source_url
     df["match_id"] = (
@@ -93,6 +103,7 @@ def normalize_matches(raw_df, season_code, division, source_url):
     columns = [
         "match_id",
         "season_code",
+        "league_name",
         "division",
         "match_date",
         "home_team",
@@ -109,63 +120,6 @@ def normalize_matches(raw_df, season_code, division, source_url):
     return df[existing_cols]
 
 
-def build_standings(matches_df):
-    if matches_df.empty:
-        return pd.DataFrame()
-
-    matches_df = matches_df.dropna(subset=["home_score", "away_score"])
-    if matches_df.empty:
-        return pd.DataFrame()
-
-    home = matches_df.assign(
-        team=matches_df["home_team"],
-        goals_for=matches_df["home_score"],
-        goals_against=matches_df["away_score"],
-        won=(matches_df["home_score"] > matches_df["away_score"]).astype(int),
-        draw=(matches_df["home_score"] == matches_df["away_score"]).astype(int),
-        lost=(matches_df["home_score"] < matches_df["away_score"]).astype(int),
-    )[["season_code", "division", "team", "goals_for", "goals_against", "won", "draw", "lost"]]
-
-    away = matches_df.assign(
-        team=matches_df["away_team"],
-        goals_for=matches_df["away_score"],
-        goals_against=matches_df["home_score"],
-        won=(matches_df["away_score"] > matches_df["home_score"]).astype(int),
-        draw=(matches_df["away_score"] == matches_df["home_score"]).astype(int),
-        lost=(matches_df["away_score"] < matches_df["home_score"]).astype(int),
-    )[["season_code", "division", "team", "goals_for", "goals_against", "won", "draw", "lost"]]
-
-    totals = pd.concat([home, away], ignore_index=True)
-    grouped = totals.groupby(["season_code", "division", "team"], as_index=False).sum(numeric_only=True)
-    grouped["played"] = grouped["won"] + grouped["draw"] + grouped["lost"]
-    grouped["goal_diff"] = grouped["goals_for"] - grouped["goals_against"]
-    grouped["points"] = grouped["won"] * 3 + grouped["draw"]
-
-    grouped = grouped.sort_values(
-        ["season_code", "division", "points", "goal_diff", "goals_for", "team"],
-        ascending=[True, True, False, False, False, True],
-    )
-    grouped["position"] = grouped.groupby(["season_code", "division"]).cumcount() + 1
-    grouped = grouped.rename(columns={"team": "team_name"})
-
-    return grouped[
-        [
-            "season_code",
-            "division",
-            "position",
-            "team_name",
-            "played",
-            "won",
-            "draw",
-            "lost",
-            "points",
-            "goals_for",
-            "goals_against",
-            "goal_diff",
-        ]
-    ]
-
-
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
     if filename.exists():
         existing = pd.read_csv(filename)
@@ -178,48 +132,40 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
     logger.info("Saved %s rows to %s", len(combined), filename)
 
 
-def fetch_spain_matches_and_standings(output_folder, seasons_back=DEFAULT_SEASONS_BACK):
+def fetch_matches(output_folder):
     output_folder.mkdir(parents=True, exist_ok=True)
-    season_codes = build_season_codes(seasons_back=seasons_back)
-    logger.info("Fetching Spain %s for seasons: %s", DIVISION, ", ".join(season_codes))
+    season_codes = build_season_codes()
 
-    match_frames = []
-    for season_code in season_codes:
-        csv_text, source_url = fetch_season_csv(season_code)
-        if not csv_text:
-            continue
-        raw_df = pd.read_csv(StringIO(csv_text))
-        normalized = normalize_matches(raw_df, season_code, DIVISION, source_url)
-        if not normalized.empty:
-            match_frames.append(normalized)
+    all_frames = []
+    for league_name, division in LEAGUES.items():
+        for season_code in season_codes:
+            logger.info("Fetching %s season %s", league_name, season_code)
+            csv_text, source_url = fetch_season_csv(season_code, division)
+            if not csv_text:
+                continue
+            raw_df = pd.read_csv(StringIO(csv_text))
+            normalized = normalize_matches(raw_df, season_code, league_name, division, source_url)
+            if not normalized.empty:
+                all_frames.append(normalized)
+            time.sleep(REQUEST_DELAY_SECONDS)
 
-    matches_df = pd.concat(match_frames, ignore_index=True) if match_frames else pd.DataFrame()
-    if not matches_df.empty:
-        merge_and_save(
-            matches_df,
-            output_folder / "matches.csv",
-            dedupe_keys=["match_id"],
-            sort_keys=["season_code", "match_date", "home_team", "away_team"],
-        )
-    else:
+    matches_df = pd.concat(all_frames, ignore_index=True) if all_frames else pd.DataFrame()
+    if matches_df.empty:
         logger.warning("No match data collected.")
+        return
 
-    standings_df = build_standings(matches_df)
-    if not standings_df.empty:
-        merge_and_save(
-            standings_df,
-            output_folder / "standings.csv",
-            dedupe_keys=["season_code", "division", "team_name"],
-            sort_keys=["season_code", "division", "position"],
-        )
-    else:
-        logger.warning("No standings data collected.")
+    merge_and_save(
+        matches_df,
+        output_folder / "matches.csv",
+        dedupe_keys=["match_id"],
+        sort_keys=["season_code", "division", "match_date", "home_team", "away_team"],
+    )
 
 
 def __main__():
     output_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
     logger.info("Output folder: %s", output_folder)
-    fetch_spain_matches_and_standings(output_folder, seasons_back=DEFAULT_SEASONS_BACK)
+    fetch_matches(output_folder)
 
 
 if __name__ == "__main__":
