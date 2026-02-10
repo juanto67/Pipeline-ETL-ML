@@ -35,7 +35,7 @@ def build_season_codes(seasons_back=SEASONS_BACK, today=None):
         codes.append(f"{start_year % 100:02d}{end_year % 100:02d}")
     return codes
 
-
+#Feching the csv file for the season and division
 def fetch_season_csv(season_code, division):
     url = f"{DATA_BASE}/{season_code}/{division}.csv"
     try:
@@ -49,7 +49,8 @@ def fetch_season_csv(season_code, division):
         logger.exception("Failed to fetch %s", url)
         return None, url
 
-
+#Change a little bit the data to be understable
+#Transform the raw to the type needed
 def normalize_matches(raw_df, season_code, league_name, division):
     required_cols = {"Date", "HomeTeam", "AwayTeam"}
     if not required_cols.issubset(raw_df.columns):
@@ -149,7 +150,7 @@ def normalize_matches(raw_df, season_code, league_name, division):
     existing_cols = [col for col in columns if col in df.columns]
     return df[existing_cols]
 
-
+#Save data to CSV, sort and remove duplicates
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
     if filename.exists():
         existing = pd.read_csv(filename)
@@ -161,7 +162,7 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)
 
-
+#Main function to fetch matches for all seasons and leagues, normalize, and save to CSV
 def fetch_matches(output_folder):
     output_folder.mkdir(parents=True, exist_ok=True)
     season_codes = build_season_codes()
