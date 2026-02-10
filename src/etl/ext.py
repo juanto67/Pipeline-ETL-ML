@@ -27,7 +27,7 @@ LEAGUES = {
 def build_season_codes(seasons_back=SEASONS_BACK, today=None):
     if today is None:
         today = date.today()
-    current_start_year = today.year if today.month >= 7 else today.year - 1
+    current_start_year = today.year
     codes = []
     for offset in range(1, seasons_back + 1):
         start_year = current_start_year - offset
@@ -81,7 +81,28 @@ def normalize_matches(raw_df, season_code, league_name, division):
         }
     )
 
-    parsed_dates = pd.to_datetime(df["Date"], errors="coerce", format="%d/%m/%y")
+    # Parse common football-data date formats without inference warnings.
+    parsed_dates = pd.to_datetime(
+        df["Date"],
+        errors="coerce",
+        dayfirst=True,
+        format="%d/%m/%y",
+    )
+    if parsed_dates.isna().any():
+        missing_mask = parsed_dates.isna()
+        parsed_dates.loc[missing_mask] = pd.to_datetime(
+            df.loc[missing_mask, "Date"],
+            errors="coerce",
+            dayfirst=True,
+            format="%d/%m/%Y",
+        )
+    if parsed_dates.isna().any():
+        missing_mask = parsed_dates.isna()
+        parsed_dates.loc[missing_mask] = pd.to_datetime(
+            df.loc[missing_mask, "Date"],
+            errors="coerce",
+            format="%Y-%m-%d",
+        )
     df["Date"] = parsed_dates.dt.strftime("%Y-%m-%d")
 
     for col in [
@@ -103,7 +124,7 @@ def normalize_matches(raw_df, season_code, league_name, division):
         "away_red",
     ]:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
 
     df["season_code"] = season_code
     df["league_name"] = league_name
@@ -164,7 +185,6 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
 
 #Main function to fetch matches for all seasons and leagues, normalize, and save to CSV
 def fetch_matches(output_folder):
-    output_folder.mkdir(parents=True, exist_ok=True)
     season_codes = build_season_codes()
 
     all_frames = []
