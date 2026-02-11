@@ -167,7 +167,7 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
     else:
         combined = df
     combined = combined.drop_duplicates(subset=dedupe_keys, keep="last")
-    combined = combined.sort_values(sort_keys, ascending=False).reset_index(drop=True)
+    combined = combined.sort_values(sort_keys).reset_index(drop=True)
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)
 
@@ -188,13 +188,28 @@ def fetch_matches(output_folder):
                 all_frames.append(normalized)
     if all_frames:
         matches_df = pd.concat(all_frames, ignore_index=True)
+        matches_liga =matches_df[matches_df["league_name"] == "La Liga"]
+        matches_premier = matches_df[matches_df["league_name"] == "Premier League"] 
+        matches_france = matches_df[matches_df["league_name"] == "Ligue 1"]
     else:
         matches_df = pd.DataFrame()
         logger.warning("No match data collected from any season or league.")
         return
     merge_and_save(
-        matches_df,
-        output_folder / "matches.csv",
+        matches_liga,
+        output_folder / "matches_liga.csv",
+        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+    )
+    merge_and_save(
+        matches_premier,
+        output_folder / "matches_premier.csv",
+        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+    )
+    merge_and_save(
+        matches_france,
+        output_folder / "matches_france.csv",
         dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
         sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
     )
