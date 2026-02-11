@@ -52,11 +52,6 @@ def fetch_season_csv(season_code, division):
 #Change a little bit the data to be understable
 #Transform the raw to the type needed
 def normalize_matches(raw_df, season_code, league_name, division):
-    required_cols = {"Date", "HomeTeam", "AwayTeam"}
-    if not required_cols.issubset(raw_df.columns):
-        logger.warning("Missing required columns in raw data")
-        return pd.DataFrame()
-
     df = raw_df.rename(
         columns={
             "FTHG": "home_score",
