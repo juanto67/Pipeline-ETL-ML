@@ -129,20 +129,8 @@ def normalize_matches(raw_df, season_code, league_name, division):
     df["season_code"] = season_code
     df["league_name"] = league_name
     df["division"] = division
-    df["match_id"] = (
-        df["season_code"].astype(str)
-        + "-"
-        + df["division"].astype(str)
-        + "-"
-        + df["Date"].astype(str)
-        + "-"
-        + df["HomeTeam"].astype(str)
-        + "-"
-        + df["AwayTeam"].astype(str)
-    )
 
     columns = [
-        "match_id",
         "season_code",
         "league_name",
         "division",
@@ -207,7 +195,7 @@ def fetch_matches(output_folder):
     merge_and_save(
         matches_df,
         output_folder / "matches.csv",
-        dedupe_keys=["match_id"],
+        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
         sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
     )
 

@@ -27,9 +27,13 @@ def __main__():
     for col in colums:
         if col in df.columns:
             df[col] = df[col].replace(
-                {"H": 0, "D": 1, "A": 2}).astype("Int64")
+                {"H": 0, "D": 1, "A": 2})
+    df_liga= df[df["league_name"] == "La Liga"]
+    df_premier= df[df["league_name"] == "Premier League"]
+    df_france= df[df["league_name"] == "Ligue 1"]
         
 def stats_team(df):
+    df.groupby(["Home_team"], key=None)
     home_stats = df.groupby(["Home_team","season_code","league_name"], as_index=False).agg(
             mean_home_score=("home_score", "mean"),
             mean_home_score_ht=("home_score_ht", "mean"),
