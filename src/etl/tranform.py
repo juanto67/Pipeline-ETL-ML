@@ -9,8 +9,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-if __name__ == "__main__":
-    __main__()
+
     
 def __main__():
     entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
@@ -56,3 +55,5 @@ def stats_team(df):
     team_stats = pd.merge(home_stats, away_stats, on=["team", "season_code", "league_name"], how="outer").fillna(0)
     return team_stats
         
+if __name__ == "__main__":
+    __main__()
