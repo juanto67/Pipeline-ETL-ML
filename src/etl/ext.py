@@ -12,7 +12,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("extract")
 
 DATA_BASE = "https://www.football-data.co.uk/mmz4281"
 SEASONS_BACK = 10
