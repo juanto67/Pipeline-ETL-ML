@@ -9,23 +9,33 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("transform")
-     
+def merge_and_save(df, filename, dedupe_keys, sort_keys):
+    if filename.exists():
+        existing = pd.read_csv(filename)
+        combined = pd.concat([existing, df], ignore_index=True)
+    else:
+        combined = df
+    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last")
+    combined = combined.sort_values(sort_keys).reset_index(drop=True)
+    combined.to_csv(filename, index=False)
+    logger.info("Saved %s rows to %s", len(combined), filename)  
+    
+    
 def stats_team(df):
     col_home = ["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red"]
-    df = df.sort_values(["HomeTeam", "Date"])
+    df = df.sort_values(["HomeTeam", "Date","season_code"])
     for c in col_home:
-        df["avg_"+c+"_5"] = df.groupby("HomeTeam")[c].shift(1).rolling(window=5, min_periods=1).mean()
-    
+        df["avg_"+c+"_5"] = df.groupby("HomeTeam")[c].shift(1).rolling(window=5, min_periods=1).mean().fillna(0).round(3)
+        
     col_away = ["away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"]    
-    df = df.sort_values(["AwayTeam", "Date"])
+    df = df.sort_values(["AwayTeam", "Date","season_code"])
     for c in col_away: 
-        df["avg_"+c+"_5"] = df.groupby("AwayTeam")[c].shift(1).rolling(window=5, min_periods=1).mean()
-    
-    
-   # home_stats = home_stats.rename(columns={"AwayTeam": "team"})
-   # away_stats = away_stats.rename(columns={"AwayTeam": "team"})
-    #team_stats = pd.merge(home_stats, away_stats, on=["team", "season_code", "league_name"], how="outer").fillna(0)
+        df["avg_"+c+"_5"] = df.groupby("AwayTeam")[c].shift(1).rolling(window=5, min_periods=1).mean().fillna(0).round(3)
+
+    df = df.drop(columns=["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red","away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
     return df
+
+
 def __main__():
     entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
     output_folder = Path(__file__).resolve().parents[1] / "data" / "proc"
@@ -44,24 +54,22 @@ def __main__():
 
     for col in colums:
         if col in df_premier.columns:
-            df_premier[col] = (
-                df_premier[col]
-                .replace({"H": 0, "D": 1, "A": 2})
-                .infer_objects(copy=False)
-            )
+            df_premier[col] = df_premier[col].map({"H": 0, "D": 1, "A": 2})
+            
         if col in df_liga.columns:
-            df_liga[col] = (
-                df_liga[col]
-                .replace({"H": 0, "D": 1, "A": 2})
-                .infer_objects(copy=False)
-            )
+            df_liga[col] = df_liga[col].map({"H": 0, "D": 1, "A": 2})
         if col in df_france.columns:
-            df_france[col] = (
-                df_france[col]
-                .replace({"H": 0, "D": 1, "A": 2})
-                .infer_objects(copy=False)
-            )
+            df_france[col] = df_france[col].map({"H": 0, "D": 1, "A": 2})
+            
     df_liga = stats_team(df_liga)
-    df_liga.to_csv(output_folder / "matches_liga.csv", index=False)      
+    df_premier = stats_team(df_premier)
+    df_france = stats_team(df_france)
+    
+    merge_and_save(df_liga, output_folder / "matches_liga.csv", dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"], sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
+    merge_and_save(df_premier, output_folder / "matches_premier.csv", dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"], sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
+    merge_and_save(df_france, output_folder / "matches_france.csv", dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"], sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
+    
+    
+    
 if __name__ == "__main__":
     __main__()
