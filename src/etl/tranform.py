@@ -11,7 +11,14 @@ logging.basicConfig(
 logger = logging.getLogger("transform")
      
 def stats_team(df):
-    df.groupby(["Home_team"], key=None)
+    col_home = ["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_shots_ht", "home_corners", "home_fouls", "home_yellow", "home_red"]
+    for c in col_home:
+        df["avg_"+c+"_5"] = df.groupby("Home_team")[c].shift(1).rolling(window=5, min_periods=1).mean()
+    
+    col_away = ["away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_shots_ht", "away_corners", "away_fouls", "away_yellow", "away_red"]    
+    for c in col_away: 
+        df["avg_"+c+"_5"] = df.groupby("Away_team")[c].shift(1).rolling(window=5, min_periods=1).mean()
+    
     home_stats = df.groupby(["Home_team","season_code","league_name"], as_index=False).agg(
             mean_home_score=("home_score", "mean"),
             mean_home_score_ht=("home_score_ht", "mean"),
