@@ -12,10 +12,12 @@ logger = logging.getLogger("transform")
      
 def stats_team(df):
     col_home = ["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_shots_ht", "home_corners", "home_fouls", "home_yellow", "home_red"]
+    df = df.sort_values(["Home_team", "match_date"])
     for c in col_home:
         df["avg_"+c+"_5"] = df.groupby("Home_team")[c].shift(1).rolling(window=5, min_periods=1).mean()
     
     col_away = ["away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_shots_ht", "away_corners", "away_fouls", "away_yellow", "away_red"]    
+    df = df.sort_values(["Away_team", "match_date"])
     for c in col_away: 
         df["avg_"+c+"_5"] = df.groupby("Away_team")[c].shift(1).rolling(window=5, min_periods=1).mean()
     
