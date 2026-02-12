@@ -23,12 +23,14 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
     
 def stats_team(df):
     col_home = ["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red"]
-    df = df.sort_values(["HomeTeam", "Date","season_code"])
+    df = df.sort_values(["season_code","Date","HomeTeam"])
+    df.to_csv("debug_home.csv", index=False)
     for c in col_home:
         df["avg_"+c+"_5"] = df.groupby("HomeTeam")[c].shift(1).rolling(window=5, min_periods=1).mean().fillna(0).round(3)
         
     col_away = ["away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"]    
-    df = df.sort_values(["AwayTeam", "Date","season_code"])
+    df = df.sort_values(["season_code","Date","AwayTeam"])
+    df.to_csv("debug_away.csv", index=False)
     for c in col_away: 
         df["avg_"+c+"_5"] = df.groupby("AwayTeam")[c].shift(1).rolling(window=5, min_periods=1).mean().fillna(0).round(3)
 
