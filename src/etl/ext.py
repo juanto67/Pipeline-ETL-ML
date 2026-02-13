@@ -12,7 +12,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("extract")
 
 DATA_BASE = "https://www.football-data.co.uk/mmz4281"
 SEASONS_BACK = 10
@@ -27,7 +27,7 @@ LEAGUES = {
 def build_season_codes(seasons_back=SEASONS_BACK, today=None):
     if today is None:
         today = date.today()
-    current_start_year = today.year if today.month >= 7 else today.year - 1
+    current_start_year = today.year
     codes = []
     for offset in range(1, seasons_back + 1):
         start_year = current_start_year - offset
@@ -52,11 +52,6 @@ def fetch_season_csv(season_code, division):
 #Change a little bit the data to be understable
 #Transform the raw to the type needed
 def normalize_matches(raw_df, season_code, league_name, division):
-    required_cols = {"Date", "HomeTeam", "AwayTeam"}
-    if not required_cols.issubset(raw_df.columns):
-        logger.warning("Missing required columns in raw data")
-        return pd.DataFrame()
-
     df = raw_df.rename(
         columns={
             "FTHG": "home_score",
@@ -81,7 +76,28 @@ def normalize_matches(raw_df, season_code, league_name, division):
         }
     )
 
-    parsed_dates = pd.to_datetime(df["Date"], errors="coerce", format="%d/%m/%y")
+    # Parse common football-data date formats without inference warnings.
+    parsed_dates = pd.to_datetime(
+        df["Date"],
+        errors="coerce",
+        dayfirst=True,
+        format="%d/%m/%y",
+    )
+    if parsed_dates.isna().any():
+        missing_mask = parsed_dates.isna()
+        parsed_dates.loc[missing_mask] = pd.to_datetime(
+            df.loc[missing_mask, "Date"],
+            errors="coerce",
+            dayfirst=True,
+            format="%d/%m/%Y",
+        )
+    if parsed_dates.isna().any():
+        missing_mask = parsed_dates.isna()
+        parsed_dates.loc[missing_mask] = pd.to_datetime(
+            df.loc[missing_mask, "Date"],
+            errors="coerce",
+            format="%Y-%m-%d",
+        )
     df["Date"] = parsed_dates.dt.strftime("%Y-%m-%d")
 
     for col in [
@@ -103,25 +119,13 @@ def normalize_matches(raw_df, season_code, league_name, division):
         "away_red",
     ]:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
 
     df["season_code"] = season_code
     df["league_name"] = league_name
     df["division"] = division
-    df["match_id"] = (
-        df["season_code"].astype(str)
-        + "-"
-        + df["division"].astype(str)
-        + "-"
-        + df["Date"].astype(str)
-        + "-"
-        + df["HomeTeam"].astype(str)
-        + "-"
-        + df["AwayTeam"].astype(str)
-    )
 
     columns = [
-        "match_id",
         "season_code",
         "league_name",
         "division",
@@ -157,14 +161,13 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = pd.concat([existing, df], ignore_index=True)
     else:
         combined = df
-    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last")
-    combined = combined.sort_values(sort_keys, ascending=False).reset_index(drop=True)
+    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
+    combined = combined.sort_values(sort_keys).reset_index(drop=True)
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)
 
 #Main function to fetch matches for all seasons and leagues, normalize, and save to CSV
 def fetch_matches(output_folder):
-    output_folder.mkdir(parents=True, exist_ok=True)
     season_codes = build_season_codes()
 
     all_frames = []
@@ -180,14 +183,29 @@ def fetch_matches(output_folder):
                 all_frames.append(normalized)
     if all_frames:
         matches_df = pd.concat(all_frames, ignore_index=True)
+        matches_liga =matches_df[matches_df["league_name"] == "La Liga"]
+        matches_premier = matches_df[matches_df["league_name"] == "Premier League"] 
+        matches_france = matches_df[matches_df["league_name"] == "Ligue 1"]
     else:
         matches_df = pd.DataFrame()
         logger.warning("No match data collected from any season or league.")
         return
     merge_and_save(
-        matches_df,
-        output_folder / "matches.csv",
-        dedupe_keys=["match_id"],
+        matches_liga,
+        output_folder / "matches_liga.csv",
+        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+    )
+    merge_and_save(
+        matches_premier,
+        output_folder / "matches_premier.csv",
+        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+    )
+    merge_and_save(
+        matches_france,
+        output_folder / "matches_france.csv",
+        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
         sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
     )
 

@@ -26,6 +26,11 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: cloudbeaver
+    ports:
+      - "8080:8978"
 
 volumes:
   postgres_data:
