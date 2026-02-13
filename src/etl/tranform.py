@@ -10,47 +10,38 @@ logging.basicConfig(
 
 logger = logging.getLogger("transform")
 
-def add_elo(df, k=10):
-    df["elo"]=100
-    df["elo_away"]=100
-    dict_team = {}
-    for i,row in df.iterrows():
+def add_elo(df, k=10, base_elo=100):
+    df = df.copy()
+    df["elo"] = base_elo
+    df["elo_away"] = base_elo
+    ratings = {}
+
+    for i, row in df.iterrows():
         home_team = row["HomeTeam"]
         away_team = row["AwayTeam"]
-        home_elo = row["elo"]
-        away_elo = row["elo_away"]
-        if home_team not in dict_team:
-            dict_team[home_team] = home_elo
-        else:
-            home_elo = dict_team[home_team]
-            df.at[i, "elo"] = home_elo
-            
-        if away_team not in dict_team:
-            dict_team[away_team] = away_elo
-        else:
-            away_elo = dict_team[away_team]
-            df.at[i, "elo_away"] = away_elo
-            
-        result = row["result"]  # 0 for home win, 1 for draw, 2 for away win
 
+        home_elo = ratings.get(home_team, base_elo)
+        away_elo = ratings.get(away_team, base_elo)
+
+        # ELO antes del partido (features)
+        df.at[i, "elo"] = home_elo
+        df.at[i, "elo_away"] = away_elo
+
+        result = row["result"]  # 0 home, 1 draw, 2 away
         expected_home = 1 / (1 + 10 ** ((away_elo - home_elo) / 400))
         expected_away = 1 / (1 + 10 ** ((home_elo - away_elo) / 400))
 
-        if result == 0:  # Home win
-            home_score = 1
-            away_score = 0
-        elif result == 1:  # Draw
-            home_score = 0.5
-            away_score = 0.5
-        else:  # Away win
-            home_score = 0
-            away_score = 1
+        if result == 0:
+            home_score, away_score = 1.0, 0.0
+        elif result == 1:
+            home_score, away_score = 0.5, 0.5
+        else:
+            home_score, away_score = 0.0, 1.0
 
-        new_home_elo = home_elo + k * (home_score - expected_home)
-        new_away_elo = away_elo + k * (away_score - expected_away)
+        ratings[home_team] = home_elo + k * (home_score - expected_home)
+        ratings[away_team] = away_elo + k * (away_score - expected_away)
 
-        dict_team[home_team] = new_home_elo
-        dict_team[away_team] = new_away_elo
+    return df
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
     if filename.exists():
         existing = pd.read_csv(filename)
