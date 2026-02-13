@@ -16,7 +16,7 @@ def add_elo(df, k=10, base_elo=100):
     df["elo"] = float(base_elo)
     df["elo_away"] = float(base_elo)
     ratings = {}
-    
+    logger.info("Starting ELO calculation for %d matches", len(df))
     season = None
     division = None
     for i, row in df.iterrows():
@@ -35,6 +35,7 @@ def add_elo(df, k=10, base_elo=100):
         # ELO antes del partido (features)
         df.at[i, "elo"] = home_elo
         df.at[i, "elo_away"] = away_elo
+        
 
         result = row["result"]  # 0 home, 1 draw, 2 away
         expected_home = 1 / (1 + 10 ** ((away_elo - home_elo) / 400))
@@ -51,6 +52,7 @@ def add_elo(df, k=10, base_elo=100):
         ratings[home_team] = round(home_elo + k * (home_score - expected_home), 3)
         ratings[away_team] = round(away_elo + k * (away_score - expected_away), 3)
     df["elo_diff"] = (df["elo"] - df["elo_away"]).round(3)
+    logger.info("Completed ELO calculation")
     return df
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
     if filename.exists():
@@ -58,7 +60,7 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = pd.concat([existing, df], ignore_index=True)
     else:
         combined = df
-    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last")
+    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
     combined = combined.sort_values(sort_keys).reset_index(drop=True)
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)  
@@ -76,6 +78,7 @@ def stats_team(df):
             .fillna(0)
             .round(3)
         )
+        logger.info("Calculated avg of last 5 matches for home team column %s", c)
         
     col_away = ["away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"]    
     df = df.sort_values(["season_code","Date","AwayTeam"])
@@ -86,7 +89,7 @@ def stats_team(df):
             .fillna(0)
             .round(3)
         )
-
+        logger.info("Calculated avg of last 5 matches for away team column %s", c)
     df = df.drop(columns=["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red","away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
     return df
 

@@ -161,7 +161,7 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = pd.concat([existing, df], ignore_index=True)
     else:
         combined = df
-    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last")
+    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
     combined = combined.sort_values(sort_keys).reset_index(drop=True)
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)
