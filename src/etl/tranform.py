@@ -24,13 +24,24 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
 def stats_team(df):
     col_home = ["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red"]
     df = df.sort_values(["season_code","Date","HomeTeam"])
+    #Calculate avg of the 5 last matches for home and away teams, moving the current match 
+    funcion = lambda s: s.shift(1).rolling(window=5, min_periods=1).mean()
     for c in col_home:
-        df["avg_"+c+"_5"] = df.groupby("HomeTeam")[c].shift(1).rolling(window=5, min_periods=1).mean().fillna(0).round(3)
+        df["avg_"+c+"_5"] = (
+            df.groupby("HomeTeam")[c]
+            .transform(funcion)
+            .fillna(0)
+            .round(3)
+        )
         
     col_away = ["away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"]    
-    df.to_csv("debug_away.csv", index=False)
     for c in col_away: 
-        df["avg_"+c+"_5"] = df.groupby("AwayTeam")[c].shift(1).rolling(window=5, min_periods=1).mean().fillna(0).round(3)
+        df["avg_"+c+"_5"] = (
+            df.groupby("AwayTeam")[c]
+            .transform(funcion)
+            .fillna(0)
+            .round(3)
+        )
 
     df = df.drop(columns=["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red","away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
     return df
@@ -55,11 +66,13 @@ def __main__():
     for col in colums:
         if col in df_premier.columns:
             df_premier[col] = df_premier[col].map({"H": 0, "D": 1, "A": 2})
-            
+            pd.to_numeric(df_premier[col], errors="coerce").astype("Int64")
         if col in df_liga.columns:
             df_liga[col] = df_liga[col].map({"H": 0, "D": 1, "A": 2})
+            pd.to_numeric(df_liga[col], errors="coerce").astype("Int64")
         if col in df_france.columns:
             df_france[col] = df_france[col].map({"H": 0, "D": 1, "A": 2})
+            pd.to_numeric(df_france[col], errors="coerce").astype("Int64")
             
     df_liga = stats_team(df_liga)
     df_premier = stats_team(df_premier)
