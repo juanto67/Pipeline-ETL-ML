@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import logging
+import sys
 from pathlib import Path
 from psycopg2 import sql
-import db
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from database import db
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -10,8 +14,19 @@ logging.basicConfig(
 
 logger = logging.getLogger("load")
 
+def create_power_bi():
+    entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
+    csv_files = list(entry_folder.glob("*.csv"))
+    for csv_file in csv_files:
+        df = pd.read_csv(csv_file)
+        teams = pd.concat([df["HomeTeam"], df["AwayTeam"]]).unique()
+        dim_team = pd.DataFrame({"team_name": teams})
+        dim_season = pd.DataFrame({"season_code": df["season_code"].unique()})
+        dim_division = pd.DataFrame({"division_name": df["division"].unique()})
+        
+        dim_league = pd.DataFrame({"league_name": df["league_name"].unique()})
 
-
+        
 def __main__():
 
     logger.info("Starting data load process")
@@ -56,6 +71,7 @@ def __main__():
         raise
     finally:
         conn.close()
+    
     
 if __name__ == "__main__":
     __main__()

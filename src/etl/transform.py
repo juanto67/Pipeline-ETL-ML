@@ -54,6 +54,7 @@ def add_elo(df, k=10, base_elo=100):
     df["elo_diff"] = (df["elo"] - df["elo_away"]).round(3)
     logger.info("Completed ELO calculation")
     return df
+
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
     if filename.exists():
         existing = pd.read_csv(filename)
@@ -97,7 +98,23 @@ def stats_team(df):
         logger.info("Calculated avg of last 5 matches for away team column %s", c)
     df = df.drop(columns=["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red","away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
     return df
+def deduplicate(df, dedupe_keys):
+    before = len(df)
+    df = df.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
+    after = len(df)
+    logger.info("Deduplicated dataframe from %d to %d rows using keys %s", before, after, dedupe_keys)
+    return df
 
+def modify_save(df_liga, df_premier, df_france, output_folder):
+    dedupe_keys = ["season_code", "division", "Date", "HomeTeam", "AwayTeam"]
+    for name, df in [("liga", df_liga), ("premier", df_premier), ("france", df_france)]:
+        if df.empty:
+            logger.warning("One of the dataframes is empty, skipping ELO and stats calculation")
+            return
+        df = deduplicate(df, dedupe_keys)
+        df = stats_team(df)
+        df = add_elo(df)
+        merge_and_save(df, output_folder / f"matches_{name}.csv", dedupe_keys=dedupe_keys, sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
 
 def __main__():
     entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
@@ -106,11 +123,7 @@ def __main__():
     #Read matches data from CSV
     df_liga = pd.read_csv(entry_folder / "matches_liga.csv")
     df_premier = pd.read_csv(entry_folder / "matches_premier.csv")
-    df_france = pd.read_csv(entry_folder / "matches_france.csv")    
-        
-    if df_liga.empty or df_premier.empty or df_france.empty:
-        logger.warning("No matches data found in some CSV")
-        return
+    df_france = pd.read_csv(entry_folder / "matches_france.csv")        
     logger.info("Loaded matches data with %d rows, %d rows, %d rows", len(df_liga), len(df_premier), len(df_france))
 
     colums= ["result_ht","result"]
@@ -125,21 +138,12 @@ def __main__():
         if col in df_france.columns:
             df_france[col] = df_france[col].map({"H": 0, "D": 1, "A": 2})
             df_france[col] = pd.to_numeric(df_france[col], errors="coerce").astype("Int64")
-
-    dedupe_keys = ["season_code", "division", "Date", "HomeTeam", "AwayTeam"]
-    df_liga = df_liga.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
-    df_premier = df_premier.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
-    df_france = df_france.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
-            
-    df_liga = stats_team(df_liga)
-    df_premier = stats_team(df_premier)
-    df_france = stats_team(df_france)
-    df_liga = add_elo(df_liga)
-    df_premier = add_elo(df_premier)
-    df_france = add_elo(df_france)
-    merge_and_save(df_liga, output_folder / "matches_liga.csv", dedupe_keys=dedupe_keys, sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
-    merge_and_save(df_premier, output_folder / "matches_premier.csv", dedupe_keys=dedupe_keys, sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
-    merge_and_save(df_france, output_folder / "matches_france.csv", dedupe_keys=dedupe_keys, sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
+    
+    df_cpy_liga = df_liga.copy()
+    df_cpy_premier = df_premier.copy()
+    df_cpy_france = df_france.copy()
+    
+    modify_save(df_liga, df_premier, df_france, output_folder)
     
     
     
