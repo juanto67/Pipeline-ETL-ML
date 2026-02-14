@@ -62,6 +62,11 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = df
     combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
     combined = combined.sort_values(sort_keys).reset_index(drop=True)
+    colums= ["result_ht","result"]
+
+    for col in colums:
+        if col in combined.columns:
+            combined[col] = pd.to_numeric(combined[col], errors="coerce").astype("Int64")
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)  
     
@@ -113,13 +118,13 @@ def __main__():
     for col in colums:
         if col in df_premier.columns:
             df_premier[col] = df_premier[col].map({"H": 0, "D": 1, "A": 2})
-            pd.to_numeric(df_premier[col], errors="coerce").astype("Int64")
+            df_premier[col] = pd.to_numeric(df_premier[col], errors="coerce").astype("Int64")
         if col in df_liga.columns:
             df_liga[col] = df_liga[col].map({"H": 0, "D": 1, "A": 2})
-            pd.to_numeric(df_liga[col], errors="coerce").astype("Int64")
+            df_liga[col] = pd.to_numeric(df_liga[col], errors="coerce").astype("Int64")
         if col in df_france.columns:
             df_france[col] = df_france[col].map({"H": 0, "D": 1, "A": 2})
-            pd.to_numeric(df_france[col], errors="coerce").astype("Int64")
+            df_france[col] = pd.to_numeric(df_france[col], errors="coerce").astype("Int64")
 
     dedupe_keys = ["season_code", "division", "Date", "HomeTeam", "AwayTeam"]
     df_liga = df_liga.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)

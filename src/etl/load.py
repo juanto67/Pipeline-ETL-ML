@@ -19,7 +19,7 @@ def __main__():
     conn = db.get_db_connection()
     logger.info("Database connection established")
     cursor = conn.cursor()
-    entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
+    entry_folder = Path(__file__).resolve().parents[1] / "data" / "proc"
     csv_files = list(entry_folder.glob("*.csv"))
 
     if not csv_files:
