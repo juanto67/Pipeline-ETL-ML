@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src ./src
 
-ENTRYPOINT ["sh", "-c", "python src/etl/ext.py && python src/etl/transform.py  && python src/etl/load.py"]
+ENTRYPOINT ["sh", "-c", "python src/etl/extract.py && python src/etl/transform.py  && python src/etl/load.py"]
