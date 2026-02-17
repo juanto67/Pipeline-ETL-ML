@@ -106,8 +106,7 @@ def change_id(conn, df, new_id_cols, old_id_cols,name_tables,name_where):
         cursor.execute(f"SELECT {new_col}, {name_where_col} FROM etl.{name_table}")
         rows = cursor.fetchall()
         id_map = {row[1]: row[0] for row in rows}
-        
-        
+        df[new_col] = df[old_col].map(id_map)
         df.drop(columns=[old_col], inplace=True)
     cursor.close()
     return df
