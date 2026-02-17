@@ -96,6 +96,7 @@ def load_data_to_db(conn, df, table_name,list_of_columns,colum_distinct):
                 query,
                 rows
             )
+            logger.info("Data loaded into table %s successfully", table_name)
     except Exception:
         conn.rollback()
         logger.exception("Data load failed")
@@ -110,6 +111,7 @@ def change_id(conn, df, new_id_cols, old_id_cols,name_tables,name_where):
         df[old_col] = df[old_col].map(id_map)
         df.rename(columns={old_col: new_col}, inplace=True)
     cursor.close()
+    logger.info("IDs changed for fact table")
     return df
 #Funcion to get df to insert into the tables of database
 def create_power_bi():
@@ -126,7 +128,11 @@ def create_power_bi():
     name_where = ["season_code", "division", "date_match", "team_name", "team_name"]
     try:
         for csv_file in csv_files:
+            logger.info("Processing file: %s", csv_file)
             df = pd.read_csv(csv_file)
+            if df.empty:
+                logger.warning("No data found in file: %s", csv_file)
+                continue
             teams = pd.concat([df["HomeTeam"], df["AwayTeam"]]).unique()
             dim_team = pd.DataFrame({"team_name": teams})
             dim_season = pd.DataFrame({"season_code": df["season_code"].unique()})
@@ -137,7 +143,7 @@ def create_power_bi():
             dim_date["year_"] = pd.to_datetime(dim_date["date_match"]).dt.year
             dim_date["week_"] = pd.to_datetime(dim_date["date_match"]).dt.isocalendar().week
             dim_league = pd.DataFrame({"league_name": df["league_name"].unique()})
-            
+            logger.info("Dataframes for dimensions created for file: %s", csv_file)
             fact_matches = df.copy()
             fact_matches.drop(columns=["league_name"], inplace=True)
             
@@ -146,10 +152,14 @@ def create_power_bi():
             dim_date = cast_dim_types(dim_date, "dim_date")
             dim_league = cast_dim_types(dim_league, "dim_league")
             
-            load_data_to_db(conn, dim_team, "dim_team", ["team_name"], ["team_name"])
-            load_data_to_db(conn, dim_season, "dim_season", ["season_code"], ["season_code"])
-            load_data_to_db(conn, dim_date, "dim_date", ["date_match", "day_", "month_", "year_", "week_"], ["date_match"])
-            load_data_to_db(conn, dim_league, "dim_league", ["league_name"], ["league_name"])
+            load_data_to_db(conn, dim_team, "dim_team", dim_team.columns.tolist(), ["team_name"])
+            
+            load_data_to_db(conn, dim_season, "dim_season", dim_season.columns.tolist(), ["season_code"])
+            
+            load_data_to_db(conn, dim_date, "dim_date", dim_date.columns.tolist(), ["date_match"])
+            
+            load_data_to_db(conn, dim_league, "dim_league", dim_league.columns.tolist(), ["league_name"])
+    
             #Get id of league to insert into the division table
             cursor.execute("SELECT d.league_id FROM etl.dim_league d where d.league_name = %s", (df["league_name"].iloc[0],))
             
@@ -160,7 +170,7 @@ def create_power_bi():
             league_id = row[0]
             dim_division["league_id"] = league_id
             dim_division = cast_dim_types(dim_division, "dim_division")
-            load_data_to_db(conn, dim_division, "dim_division", ["division", "league_id"], ["division"])
+            load_data_to_db(conn, dim_division, "dim_division", dim_division.columns.tolist(), ["division"])
             
             fact_matches = change_id(conn, fact_matches, new_cols, old_cols,name_tables,name_where)
             fact_matches = cast_dim_types(fact_matches, "fact_matches")
