@@ -100,6 +100,17 @@ def load_data_to_db(conn, df, table_name,list_of_columns,colum_distinct):
         conn.rollback()
         logger.exception("Data load failed")
         raise
+def change_id(conn, df, new_id_cols, old_id_cols,name_tables,name_where):
+    cursor = conn.cursor()
+    for new_col, old_col,name_table,name_where_col in zip(new_id_cols, old_id_cols,name_tables,name_where):
+        cursor.execute(f"SELECT {new_col}, {name_where_col} FROM etl.{name_table}")
+        rows = cursor.fetchall()
+        id_map = {row[1]: row[0] for row in rows}
+        
+        
+        df.drop(columns=[old_col], inplace=True)
+    cursor.close()
+    return df
 def create_power_bi():
     entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
     csv_files = list(entry_folder.glob("*.csv"))
@@ -121,7 +132,14 @@ def create_power_bi():
             dim_date["year_"] = pd.to_datetime(dim_date["date_match"]).dt.year
             dim_date["week_"] = pd.to_datetime(dim_date["date_match"]).dt.isocalendar().week
             dim_league = pd.DataFrame({"league_name": df["league_name"].unique()})
-
+            
+            fact_matches = df.copy()
+            fact_matches.drop(columns=["league_name"], inplace=True)
+            new_cols = ["season_id", "division_id", "date_id", "home_team_id", "away_team_id"]
+            old_cols = ["season_code", "division", "Date", "HomeTeam", "AwayTeam"]
+            name_tables = ["dim_season", "dim_division", "dim_date", "dim_team", "dim_team"]
+            name_where = ["season_code", "division", "date_match", "team_name", "team_name"]
+            fact_matches = change_id(conn, fact_matches, new_cols, old_cols,name_tables,name_where)
             dim_team = cast_dim_types(dim_team, "dim_team")
             dim_season = cast_dim_types(dim_season, "dim_season")
             dim_date = cast_dim_types(dim_date, "dim_date")
