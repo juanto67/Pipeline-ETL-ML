@@ -16,7 +16,6 @@ logger = logging.getLogger("extract")
 
 DATA_BASE = "https://www.football-data.co.uk/mmz4281"
 SEASONS_BACK = 10
-SLEEP_TO_REQUEST = 0.2  # seconds
 LEAGUES = {
     "La Liga": "SP1",
     "Premier League": "E0",

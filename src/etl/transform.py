@@ -3,13 +3,14 @@ import logging
 import pandas as pd
 from pathlib import Path
 import os
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 
 logger = logging.getLogger("transform")
-
+#Calculating the ELO rating for each team before the match, and the difference between them as a feature for the model
 def add_elo(df, k=10, base_elo=100):
     df = df.sort_values(["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
     df = df.copy()
@@ -32,7 +33,7 @@ def add_elo(df, k=10, base_elo=100):
         home_elo = ratings.get(home_team, base_elo)
         away_elo = ratings.get(away_team, base_elo)
 
-        # ELO antes del partido (features)
+        # ELO features
         df.at[i, "elo"] = home_elo
         df.at[i, "elo_away"] = away_elo
         
@@ -54,7 +55,7 @@ def add_elo(df, k=10, base_elo=100):
     df["elo_diff"] = (df["elo"] - df["elo_away"]).round(3)
     logger.info("Completed ELO calculation")
     return df
-
+#Saving into CSV and drop duplicates and sorting
 def merge_and_save(df, filename, dedupe_keys, sort_keys):
     if filename.exists():
         existing = pd.read_csv(filename)
@@ -71,7 +72,7 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)  
     
-    
+#Get avg for all of the statas for the las 5 matches for home and away team    
 def stats_team(df):
     col_home = ["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red"]
     df = df.sort_values(["season_code","Date","HomeTeam"])
@@ -98,13 +99,14 @@ def stats_team(df):
         logger.info("Calculated avg of last 5 matches for away team column %s", c)
     df = df.drop(columns=["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red","away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
     return df
+#Drop duplicates before using df
 def deduplicate(df, dedupe_keys):
     before = len(df)
     df = df.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
     after = len(df)
     logger.info("Deduplicated dataframe from %d to %d rows using keys %s", before, after, dedupe_keys)
     return df
-
+#Funcion to modifa df and save it
 def modify_save(df_liga, df_premier, df_france, output_folder):
     dedupe_keys = ["season_code", "division", "Date", "HomeTeam", "AwayTeam"]
     for name, df in [("liga", df_liga), ("premier", df_premier), ("france", df_france)]:
@@ -115,7 +117,7 @@ def modify_save(df_liga, df_premier, df_france, output_folder):
         df = stats_team(df)
         df = add_elo(df)
         merge_and_save(df, output_folder / f"matches_{name}.csv", dedupe_keys=dedupe_keys, sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
-
+#Main function to read data, transform it and save it
 def __main__():
     entry_folder = Path(__file__).resolve().parents[1] / "data" / "entry"
     output_folder = Path(__file__).resolve().parents[1] / "data" / "proc"
@@ -139,9 +141,6 @@ def __main__():
             df_france[col] = df_france[col].map({"H": 0, "D": 1, "A": 2})
             df_france[col] = pd.to_numeric(df_france[col], errors="coerce").astype("Int64")
     
-    df_cpy_liga = df_liga.copy()
-    df_cpy_premier = df_premier.copy()
-    df_cpy_france = df_france.copy()
     
     modify_save(df_liga, df_premier, df_france, output_folder)
     
