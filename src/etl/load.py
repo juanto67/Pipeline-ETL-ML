@@ -41,8 +41,8 @@ def cast_dim_types(df, table_name):
             "away_score_ht": "int",
             "result_match": "int",
             "result_ht": "int",
-            "home_goals": "int",
-            "away_goals": "int",
+            "home_score": "int",
+            "away_score": "int",
             "home_shots": "int",
             "away_shots": "int",
             "home_shots_on_target": "int",
@@ -104,11 +104,24 @@ def load_data_to_db(conn, df, table_name,list_of_columns,colum_distinct):
 #Get id and change it in the df to be able to insert into the fact table
 def change_id(conn, df, new_id_cols, old_id_cols,name_tables,name_where):
     cursor = conn.cursor()
+    colums= ["result_ht","result"]
+
+    for col in colums:
+        if col in df.columns:
+            df[col] = df[col].map({"H": 0, "D": 1, "A": 2})
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
     for new_col, old_col,name_table,name_where_col in zip(new_id_cols, old_id_cols,name_tables,name_where):
+        if name_where_col == "date_match" and old_col in df.columns:
+            df[old_col] = pd.to_datetime(df[old_col], errors="coerce").dt.date
+        if new_col == "home_team_id" or new_col == "away_team_id":
+            copy = new_col
+            new_col = "team_id"
         cursor.execute(f"SELECT {new_col}, {name_where_col} FROM etl.{name_table}")
         rows = cursor.fetchall()
         id_map = {row[1]: row[0] for row in rows}
         df[old_col] = df[old_col].map(id_map)
+        if new_col == "team_id":
+            new_col = copy
         df.rename(columns={old_col: new_col}, inplace=True)
     cursor.close()
     logger.info("IDs changed for fact table")
@@ -160,7 +173,7 @@ def create_power_bi():
             
             load_data_to_db(conn, dim_league, "dim_league", dim_league.columns.tolist(), ["league_name"])
     
-            #Get id of league to insert into the division table
+            #Get id of league to insert into the division table we have only 1 league in the csv file so we can get the id of the league and insert it into the division table
             cursor.execute("SELECT d.league_id FROM etl.dim_league d where d.league_name = %s", (df["league_name"].iloc[0],))
             
             row = cursor.fetchone()
@@ -173,6 +186,7 @@ def create_power_bi():
             load_data_to_db(conn, dim_division, "dim_division", dim_division.columns.tolist(), ["division"])
             
             fact_matches = change_id(conn, fact_matches, new_cols, old_cols,name_tables,name_where)
+            fact_matches = fact_matches.rename(columns={"result": "result_match"})
             fact_matches = cast_dim_types(fact_matches, "fact_matches")
             load_data_to_db(conn, fact_matches, "fact_matches", fact_matches.columns.tolist(), new_cols)
         conn.commit()
