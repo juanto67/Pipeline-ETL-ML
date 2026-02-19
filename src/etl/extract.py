@@ -16,7 +16,6 @@ logger = logging.getLogger("extract")
 
 DATA_BASE = "https://www.football-data.co.uk/mmz4281"
 SEASONS_BACK = 10
-SLEEP_TO_REQUEST = 0.2  # seconds
 LEAGUES = {
     "La Liga": "SP1",
     "Premier League": "E0",
@@ -163,6 +162,26 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = df
     combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
     combined = combined.sort_values(sort_keys).reset_index(drop=True)
+    for col in [
+        "home_score",
+        "away_score",
+        "home_score_ht",
+        "away_score_ht",
+        "home_shots",
+        "away_shots",
+        "home_shots_on_target",
+        "away_shots_on_target",
+        "home_corners",
+        "away_corners",
+        "home_fouls",
+        "away_fouls",
+        "home_yellow",
+        "away_yellow",
+        "home_red",
+        "away_red",
+    ]:
+        if col in df.columns:
+            combined[col] = pd.to_numeric(combined[col], errors="coerce").astype("Int64")
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)
 
