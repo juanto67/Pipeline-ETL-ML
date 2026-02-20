@@ -1,8 +1,10 @@
 venv/
 env/
 .env
+src/airflow/
 objetivo.txt
 Ayudas.md
 __pycache__/
 *.pyc
 *.pyo
+airflow-passwords.json

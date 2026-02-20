@@ -160,8 +160,16 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = pd.concat([existing, df], ignore_index=True)
     else:
         combined = df
-    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
-    combined = combined.sort_values(sort_keys).reset_index(drop=True)
+
+    for col in dedupe_keys:
+        if col in combined.columns:
+            combined[col] = combined[col].astype(str).str.strip()
+
+    if "Date" in combined.columns:
+        combined["Date"] = pd.to_datetime(
+            combined["Date"], errors="coerce"
+        ).dt.strftime("%Y-%m-%d")
+
     for col in [
         "home_score",
         "away_score",
@@ -180,8 +188,10 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         "home_red",
         "away_red",
     ]:
-        if col in df.columns:
+        if col in combined.columns:
             combined[col] = pd.to_numeric(combined[col], errors="coerce").astype("Int64")
+    combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
+    combined = combined.sort_values(sort_keys).reset_index(drop=True)
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename)
 
