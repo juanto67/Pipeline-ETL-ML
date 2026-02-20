@@ -1,6 +1,8 @@
 venv/
 env/
 .env
+objetivo.txt
+Ayudas.md
 __pycache__/
 *.pyc
 *.pyo
