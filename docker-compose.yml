@@ -38,6 +38,27 @@ services:
     container_name: cloudbeaver
     ports:
       - "8080:8978"
+  airflow:
+    image: apache/airflow:3.1.0-python3.10
+    container_name: airflow
+    command: standalone
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST_TRUE}:${DB_PORT}/${POSTGRES_DB}
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:ADMIN
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    volumes:
+      - ./src/dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
+      - airflow_plugins:/opt/airflow/plugins
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
 
-volumes:
+volumes: 
   postgres_data:
+  airflow_logs:
+  airflow_plugins:
