@@ -3680,3 +3680,13 @@ season_code,league_name,division,Date,HomeTeam,AwayTeam,home_score,away_score,re
 2526,Premier League,E0,2026-02-11,Sunderland,Liverpool,0,1,A,0,0,D,11,23,2,3,3,11,8,10,1,0,0,0
 2526,Premier League,E0,2026-02-12,Brentford,Arsenal,1,1,D,0,0,D,12,7,3,2,6,4,12,11,3,2,0,0
 2526,Premier League,E0,2026-02-18,Wolves,Arsenal,2,2,D,0,1,A,5,10,2,4,1,3,6,8,2,1,0,0
+2526,Premier League,E0,2026-02-21,Aston Villa,Leeds,1,1,D,0,1,A,16,14,4,4,7,2,11,16,1,4,0,0
+2526,Premier League,E0,2026-02-21,Brentford,Brighton,0,2,A,0,2,A,13,11,3,7,6,4,9,14,1,2,0,0
+2526,Premier League,E0,2026-02-21,Chelsea,Burnley,1,1,D,1,0,H,12,12,2,4,9,5,13,11,2,2,1,0
+2526,Premier League,E0,2026-02-21,Man City,Newcastle,2,1,H,2,1,H,15,13,7,7,5,5,12,13,2,5,0,0
+2526,Premier League,E0,2026-02-21,West Ham,Bournemouth,0,0,D,0,0,D,20,10,3,5,9,5,10,11,1,1,0,0
+2526,Premier League,E0,2026-02-22,Crystal Palace,Wolves,1,0,H,0,0,D,14,12,3,7,7,3,19,13,5,1,0,1
+2526,Premier League,E0,2026-02-22,Nott'm Forest,Liverpool,0,1,A,0,0,D,18,10,2,4,7,2,13,9,2,0,0,0
+2526,Premier League,E0,2026-02-22,Sunderland,Fulham,1,3,A,0,0,D,12,12,2,4,6,4,6,13,1,1,0,0
+2526,Premier League,E0,2026-02-22,Tottenham,Arsenal,1,4,A,1,1,D,6,20,5,7,2,5,17,11,2,1,0,0
+2526,Premier League,E0,2026-02-23,Everton,Man United,0,1,A,0,0,D,12,11,4,3,10,1,12,7,2,3,0,0
