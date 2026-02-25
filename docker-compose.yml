@@ -24,15 +24,12 @@ services:
     build: .
     image: pipeline-etl-ml:latest
     container_name: airflow
-    user: "${AIRFLOW_UID:-50000}:0"
     command: standalone
     depends_on:
       - postgres
     env_file:
       - .env
     volumes:
-      - ./src:/opt/airflow/src
-      - ./src/dags:/opt/airflow/dags
       - airflow_logs:/opt/airflow/logs
       - airflow_plugins:/opt/airflow/plugins
     ports:
