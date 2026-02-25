@@ -159,7 +159,9 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         existing = pd.read_csv(filename)
         combined = pd.concat([existing, df], ignore_index=True)
     else:
-        combined = df
+        combined = df.copy()
+
+    combined = combined.copy()
 
     for col in dedupe_keys:
         if col in combined.columns:
@@ -197,6 +199,7 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
 
 #Main function to fetch matches for all seasons and leagues, normalize, and save to CSV
 def fetch_matches(output_folder):
+    output_folder.mkdir(parents=True, exist_ok=True)
     season_codes = build_season_codes()
 
     all_frames = []
@@ -212,9 +215,9 @@ def fetch_matches(output_folder):
                 all_frames.append(normalized)
     if all_frames:
         matches_df = pd.concat(all_frames, ignore_index=True)
-        matches_liga =matches_df[matches_df["league_name"] == "La Liga"]
-        matches_premier = matches_df[matches_df["league_name"] == "Premier League"] 
-        matches_france = matches_df[matches_df["league_name"] == "Ligue 1"]
+        matches_liga = matches_df[matches_df["league_name"] == "La Liga"].copy()
+        matches_premier = matches_df[matches_df["league_name"] == "Premier League"].copy()
+        matches_france = matches_df[matches_df["league_name"] == "Ligue 1"].copy()
     else:
         matches_df = pd.DataFrame()
         logger.warning("No match data collected from any season or league.")
