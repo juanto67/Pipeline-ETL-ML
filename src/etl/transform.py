@@ -10,6 +10,16 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("transform")
+
+
+def encode_result_columns(df, columns=("result_ht", "result")):
+    for col in columns:
+        if col in df.columns:
+            df[col] = df[col].map({"H": 0, "D": 1, "A": 2})
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+    return df
+
+
 #Calculating the ELO rating for each team before the match, and the difference between them as a feature for the model
 def add_elo(df, k=10, base_elo=100):
     df = df.sort_values(["season_code", "division", "Date", "HomeTeam", "AwayTeam"])
@@ -107,12 +117,12 @@ def deduplicate(df, dedupe_keys):
     logger.info("Deduplicated dataframe from %d to %d rows using keys %s", before, after, dedupe_keys)
     return df
 #Funcion to modifa df and save it
-def modify_save(df_liga, df_premier, df_france, output_folder):
+def modify_save(dataframes, output_folder):
     dedupe_keys = ["season_code", "division", "Date", "HomeTeam", "AwayTeam"]
-    for name, df in [("liga", df_liga), ("premier", df_premier), ("france", df_france)]:
+    for name, df in dataframes.items():
         if df.empty:
-            logger.warning("One of the dataframes is empty, skipping ELO and stats calculation")
-            return
+            logger.warning("Dataframe %s is empty, skipping ELO and stats calculation", name)
+            continue
         df = deduplicate(df, dedupe_keys)
         df = stats_team(df)
         df = add_elo(df)
@@ -123,26 +133,21 @@ def __main__():
     output_folder = Path(__file__).resolve().parents[1] / "data" / "proc"
     os.makedirs(output_folder, exist_ok=True)
     #Read matches data from CSV
-    df_liga = pd.read_csv(entry_folder / "matches_liga.csv")
-    df_premier = pd.read_csv(entry_folder / "matches_premier.csv")
-    df_france = pd.read_csv(entry_folder / "matches_france.csv")        
-    logger.info("Loaded matches data with %d rows, %d rows, %d rows", len(df_liga), len(df_premier), len(df_france))
+    csv_files = sorted(entry_folder.glob("matches_*.csv"))
+    if not csv_files:
+        logger.warning("No input files found in %s", entry_folder)
+        return
 
-    colums= ["result_ht","result"]
+    dataframes = {}
+    for file in csv_files:
+        league_name = file.stem.replace("matches_", "", 1)
+        df = pd.read_csv(file)
+        df = encode_result_columns(df)
+        dataframes[league_name] = df
+        logger.info("Loaded %s with %d rows", file.name, len(df))
 
-    for col in colums:
-        if col in df_premier.columns:
-            df_premier[col] = df_premier[col].map({"H": 0, "D": 1, "A": 2})
-            df_premier[col] = pd.to_numeric(df_premier[col], errors="coerce").astype("Int64")
-        if col in df_liga.columns:
-            df_liga[col] = df_liga[col].map({"H": 0, "D": 1, "A": 2})
-            df_liga[col] = pd.to_numeric(df_liga[col], errors="coerce").astype("Int64")
-        if col in df_france.columns:
-            df_france[col] = df_france[col].map({"H": 0, "D": 1, "A": 2})
-            df_france[col] = pd.to_numeric(df_france[col], errors="coerce").astype("Int64")
-    
-    
-    modify_save(df_liga, df_premier, df_france, output_folder)
+    logger.info("Loaded %d leagues", len(dataframes))
+    modify_save(dataframes, output_folder)
     
     
     
