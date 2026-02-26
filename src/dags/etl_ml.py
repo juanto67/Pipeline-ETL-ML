@@ -17,7 +17,7 @@ dag = DAG(
     dag_id="etl_ml_pipeline",
     default_args=default_args,
     start_date=datetime(2024, 1, 1),
-    schedule="@daily",
+    schedule="@weekly",
     catchup=False,
     tags=["etl", "ml"],
 )
