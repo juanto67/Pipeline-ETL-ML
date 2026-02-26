@@ -1,0 +1,744 @@
+league_id,team,cluster,season_code
+0,Alaves,1,1718
+0,Alaves,1,1819
+0,Alaves,0,1920
+0,Alaves,0,2021
+0,Alaves,0,2122
+0,Alaves,1,2223
+0,Alaves,0,2324
+0,Alaves,1,2425
+0,Alaves,1,2526
+0,Almeria,1,2324
+0,Almeria,1,2425
+0,Almeria,1,2526
+0,Ath Bilbao,2,1718
+0,Ath Bilbao,1,1819
+0,Ath Bilbao,0,1920
+0,Ath Bilbao,2,2021
+0,Ath Bilbao,1,2122
+0,Ath Bilbao,2,2223
+0,Ath Bilbao,1,2324
+0,Ath Bilbao,1,2425
+0,Ath Bilbao,1,2526
+0,Ath Madrid,2,1718
+0,Ath Madrid,1,1819
+0,Ath Madrid,2,1920
+0,Ath Madrid,2,2021
+0,Ath Madrid,1,2122
+0,Ath Madrid,2,2223
+0,Ath Madrid,1,2324
+0,Ath Madrid,1,2425
+0,Ath Madrid,1,2526
+0,Barcelona,2,1718
+0,Barcelona,2,1819
+0,Barcelona,1,1920
+0,Barcelona,1,2021
+0,Barcelona,2,2122
+0,Barcelona,2,2223
+0,Barcelona,2,2324
+0,Barcelona,2,2425
+0,Barcelona,2,2526
+0,Betis,1,1718
+0,Betis,1,1819
+0,Betis,0,1920
+0,Betis,2,2021
+0,Betis,1,2122
+0,Betis,1,2223
+0,Betis,1,2324
+0,Betis,1,2425
+0,Betis,1,2526
+0,Cadiz,1,2122
+0,Cadiz,1,2223
+0,Cadiz,1,2324
+0,Cadiz,1,2425
+0,Cadiz,1,2526
+0,Celta,1,1718
+0,Celta,1,1819
+0,Celta,0,1920
+0,Celta,2,2021
+0,Celta,1,2122
+0,Celta,1,2223
+0,Celta,1,2324
+0,Celta,1,2425
+0,Celta,1,2526
+0,Eibar,1,1718
+0,Eibar,1,1819
+0,Eibar,2,1920
+0,Eibar,2,2021
+0,Eibar,1,2122
+0,Eibar,2,2223
+0,Eibar,1,2324
+0,Eibar,1,2425
+0,Eibar,1,2526
+0,Elche,1,2122
+0,Elche,1,2223
+0,Elche,0,2324
+0,Elche,1,2425
+0,Elche,1,2526
+0,Espanol,0,1718
+0,Espanol,1,1819
+0,Espanol,0,1920
+0,Espanol,2,2021
+0,Espanol,1,2122
+0,Espanol,1,2223
+0,Espanol,1,2324
+0,Espanol,1,2425
+0,Espanol,1,2526
+0,Getafe,0,1819
+0,Getafe,0,1920
+0,Getafe,0,2021
+0,Getafe,0,2122
+0,Getafe,0,2223
+0,Getafe,0,2324
+0,Getafe,0,2425
+0,Getafe,0,2526
+0,Girona,1,1819
+0,Girona,0,1920
+0,Girona,0,2021
+0,Girona,1,2122
+0,Girona,1,2223
+0,Girona,1,2324
+0,Girona,1,2425
+0,Girona,1,2526
+0,Granada,1,1718
+0,Granada,1,1819
+0,Granada,0,1920
+0,Granada,0,2021
+0,Granada,0,2122
+0,Granada,1,2223
+0,Granada,0,2324
+0,Granada,1,2425
+0,Granada,1,2526
+0,Huesca,0,1920
+0,Huesca,0,2021
+0,Huesca,1,2122
+0,Huesca,1,2223
+0,Huesca,1,2324
+0,Huesca,1,2425
+0,Huesca,1,2526
+0,La Coruna,1,1718
+0,La Coruna,1,1819
+0,La Coruna,0,1920
+0,La Coruna,2,2021
+0,La Coruna,1,2122
+0,La Coruna,1,2223
+0,La Coruna,1,2324
+0,La Coruna,1,2425
+0,La Coruna,1,2526
+0,Las Palmas,1,1718
+0,Las Palmas,1,1819
+0,Las Palmas,0,1920
+0,Las Palmas,2,2021
+0,Las Palmas,1,2122
+0,Las Palmas,1,2223
+0,Las Palmas,1,2324
+0,Las Palmas,1,2425
+0,Las Palmas,1,2526
+0,Leganes,0,1718
+0,Leganes,1,1819
+0,Leganes,0,1920
+0,Leganes,0,2021
+0,Leganes,0,2122
+0,Leganes,0,2223
+0,Leganes,0,2324
+0,Leganes,0,2425
+0,Leganes,1,2526
+0,Levante,1,1819
+0,Levante,2,1920
+0,Levante,2,2021
+0,Levante,1,2122
+0,Levante,1,2223
+0,Levante,1,2324
+0,Levante,1,2425
+0,Levante,1,2526
+0,Malaga,1,1718
+0,Malaga,1,1819
+0,Malaga,0,1920
+0,Malaga,2,2021
+0,Malaga,0,2122
+0,Malaga,1,2223
+0,Malaga,0,2324
+0,Malaga,1,2425
+0,Malaga,1,2526
+0,Mallorca,2,2021
+0,Mallorca,1,2122
+0,Mallorca,1,2223
+0,Mallorca,0,2324
+0,Mallorca,1,2425
+0,Mallorca,1,2526
+0,Osasuna,1,1718
+0,Osasuna,1,1819
+0,Osasuna,0,1920
+0,Osasuna,0,2021
+0,Osasuna,0,2122
+0,Osasuna,1,2223
+0,Osasuna,1,2324
+0,Osasuna,1,2425
+0,Osasuna,1,2526
+0,Real Madrid,2,1718
+0,Real Madrid,2,1819
+0,Real Madrid,1,1920
+0,Real Madrid,1,2021
+0,Real Madrid,2,2122
+0,Real Madrid,2,2223
+0,Real Madrid,2,2324
+0,Real Madrid,2,2425
+0,Real Madrid,2,2526
+0,Sevilla,1,1718
+0,Sevilla,1,1819
+0,Sevilla,2,1920
+0,Sevilla,2,2021
+0,Sevilla,1,2122
+0,Sevilla,2,2223
+0,Sevilla,1,2324
+0,Sevilla,1,2425
+0,Sevilla,1,2526
+0,Sociedad,2,1718
+0,Sociedad,2,1819
+0,Sociedad,2,1920
+0,Sociedad,2,2021
+0,Sociedad,1,2122
+0,Sociedad,2,2223
+0,Sociedad,1,2324
+0,Sociedad,1,2425
+0,Sociedad,1,2526
+0,Sp Gijon,1,1718
+0,Sp Gijon,1,1819
+0,Sp Gijon,0,1920
+0,Sp Gijon,0,2021
+0,Sp Gijon,0,2122
+0,Sp Gijon,1,2223
+0,Sp Gijon,0,2324
+0,Sp Gijon,1,2425
+0,Sp Gijon,1,2526
+0,Valencia,1,1718
+0,Valencia,1,1819
+0,Valencia,2,1920
+0,Valencia,2,2021
+0,Valencia,1,2122
+0,Valencia,1,2223
+0,Valencia,1,2324
+0,Valencia,1,2425
+0,Valencia,1,2526
+0,Valladolid,0,1920
+0,Valladolid,2,2021
+0,Valladolid,1,2122
+0,Valladolid,1,2223
+0,Valladolid,1,2324
+0,Valladolid,1,2425
+0,Valladolid,1,2526
+0,Vallecano,0,1920
+0,Vallecano,2,2021
+0,Vallecano,0,2122
+0,Vallecano,1,2223
+0,Vallecano,1,2324
+0,Vallecano,1,2425
+0,Vallecano,1,2526
+0,Villarreal,2,1718
+0,Villarreal,1,1819
+0,Villarreal,2,1920
+0,Villarreal,2,2021
+0,Villarreal,1,2122
+0,Villarreal,2,2223
+0,Villarreal,1,2324
+0,Villarreal,1,2425
+0,Villarreal,1,2526
+1,Ajaccio,2,2324
+1,Ajaccio,0,2425
+1,Ajaccio,2,2526
+1,Amiens,0,1819
+1,Amiens,1,1920
+1,Amiens,0,2021
+1,Amiens,1,2122
+1,Amiens,1,2223
+1,Amiens,2,2324
+1,Amiens,0,2425
+1,Amiens,0,2526
+1,Angers,2,1718
+1,Angers,2,1819
+1,Angers,2,1920
+1,Angers,2,2021
+1,Angers,0,2122
+1,Angers,0,2223
+1,Angers,1,2324
+1,Angers,2,2425
+1,Angers,0,2526
+1,Auxerre,1,2324
+1,Auxerre,2,2425
+1,Auxerre,0,2526
+1,Bastia,0,1718
+1,Bastia,0,1819
+1,Bastia,1,1920
+1,Bastia,0,2021
+1,Bastia,2,2122
+1,Bastia,2,2223
+1,Bastia,1,2324
+1,Bastia,0,2425
+1,Bastia,0,2526
+1,Bordeaux,2,1718
+1,Bordeaux,2,1819
+1,Bordeaux,1,1920
+1,Bordeaux,1,2021
+1,Bordeaux,1,2122
+1,Bordeaux,1,2223
+1,Bordeaux,2,2324
+1,Bordeaux,0,2425
+1,Bordeaux,0,2526
+1,Brest,2,2021
+1,Brest,0,2122
+1,Brest,0,2223
+1,Brest,1,2324
+1,Brest,2,2425
+1,Brest,0,2526
+1,Caen,0,1718
+1,Caen,2,1819
+1,Caen,1,1920
+1,Caen,0,2021
+1,Caen,1,2122
+1,Caen,1,2223
+1,Caen,2,2324
+1,Caen,0,2425
+1,Caen,0,2526
+1,Clermont,2,2223
+1,Clermont,1,2324
+1,Clermont,2,2425
+1,Clermont,0,2526
+1,Dijon,0,1718
+1,Dijon,0,1819
+1,Dijon,1,1920
+1,Dijon,0,2021
+1,Dijon,1,2122
+1,Dijon,1,2223
+1,Dijon,2,2324
+1,Dijon,0,2425
+1,Dijon,0,2526
+1,Guingamp,2,1718
+1,Guingamp,2,1819
+1,Guingamp,2,1920
+1,Guingamp,2,2021
+1,Guingamp,0,2122
+1,Guingamp,0,2223
+1,Guingamp,1,2324
+1,Guingamp,2,2425
+1,Guingamp,0,2526
+1,Le Havre,0,2425
+1,Le Havre,0,2526
+1,Lens,1,2122
+1,Lens,0,2223
+1,Lens,0,2324
+1,Lens,1,2425
+1,Lens,1,2526
+1,Lille,2,1718
+1,Lille,2,1819
+1,Lille,2,1920
+1,Lille,2,2021
+1,Lille,1,2122
+1,Lille,0,2223
+1,Lille,0,2324
+1,Lille,1,2425
+1,Lille,1,2526
+1,Lorient,0,1718
+1,Lorient,2,1819
+1,Lorient,2,1920
+1,Lorient,0,2021
+1,Lorient,0,2122
+1,Lorient,1,2223
+1,Lorient,1,2324
+1,Lorient,2,2425
+1,Lorient,0,2526
+1,Lyon,1,1718
+1,Lyon,1,1819
+1,Lyon,0,1920
+1,Lyon,2,2021
+1,Lyon,1,2122
+1,Lyon,0,2223
+1,Lyon,0,2324
+1,Lyon,1,2425
+1,Lyon,1,2526
+1,Marseille,2,1718
+1,Marseille,1,1819
+1,Marseille,0,1920
+1,Marseille,1,2021
+1,Marseille,1,2122
+1,Marseille,0,2223
+1,Marseille,0,2324
+1,Marseille,1,2425
+1,Marseille,1,2526
+1,Metz,0,1718
+1,Metz,0,1819
+1,Metz,1,1920
+1,Metz,0,2021
+1,Metz,1,2122
+1,Metz,1,2223
+1,Metz,2,2324
+1,Metz,0,2425
+1,Metz,0,2526
+1,Monaco,1,1718
+1,Monaco,1,1819
+1,Monaco,0,1920
+1,Monaco,1,2021
+1,Monaco,1,2122
+1,Monaco,0,2223
+1,Monaco,0,2324
+1,Monaco,1,2425
+1,Monaco,1,2526
+1,Montpellier,0,1718
+1,Montpellier,2,1819
+1,Montpellier,2,1920
+1,Montpellier,2,2021
+1,Montpellier,1,2122
+1,Montpellier,0,2223
+1,Montpellier,1,2324
+1,Montpellier,2,2425
+1,Montpellier,0,2526
+1,Nancy,0,1718
+1,Nancy,0,1819
+1,Nancy,1,1920
+1,Nancy,0,2021
+1,Nancy,1,2122
+1,Nancy,1,2223
+1,Nancy,2,2324
+1,Nancy,0,2425
+1,Nancy,0,2526
+1,Nantes,2,1718
+1,Nantes,2,1819
+1,Nantes,1,1920
+1,Nantes,1,2021
+1,Nantes,1,2122
+1,Nantes,0,2223
+1,Nantes,2,2324
+1,Nantes,0,2425
+1,Nantes,0,2526
+1,Nice,2,1718
+1,Nice,2,1819
+1,Nice,2,1920
+1,Nice,1,2021
+1,Nice,1,2122
+1,Nice,0,2223
+1,Nice,0,2324
+1,Nice,1,2425
+1,Nice,1,2526
+1,Nimes,2,1920
+1,Nimes,2,2021
+1,Nimes,0,2122
+1,Nimes,0,2223
+1,Nimes,1,2324
+1,Nimes,2,2425
+1,Nimes,0,2526
+1,Paris SG,1,1718
+1,Paris SG,1,1819
+1,Paris SG,0,1920
+1,Paris SG,2,2021
+1,Paris SG,1,2122
+1,Paris SG,0,2223
+1,Paris SG,0,2324
+1,Paris SG,1,2425
+1,Paris SG,1,2526
+1,Reims,1,1920
+1,Reims,1,2021
+1,Reims,1,2122
+1,Reims,1,2223
+1,Reims,2,2324
+1,Reims,0,2425
+1,Reims,0,2526
+1,Rennes,2,1718
+1,Rennes,2,1819
+1,Rennes,2,1920
+1,Rennes,2,2021
+1,Rennes,1,2122
+1,Rennes,0,2223
+1,Rennes,0,2324
+1,Rennes,1,2425
+1,Rennes,1,2526
+1,St Etienne,2,1718
+1,St Etienne,2,1819
+1,St Etienne,2,1920
+1,St Etienne,1,2021
+1,St Etienne,1,2122
+1,St Etienne,0,2223
+1,St Etienne,2,2324
+1,St Etienne,0,2425
+1,St Etienne,0,2526
+1,Strasbourg,0,1819
+1,Strasbourg,1,1920
+1,Strasbourg,1,2021
+1,Strasbourg,1,2122
+1,Strasbourg,0,2223
+1,Strasbourg,2,2324
+1,Strasbourg,0,2425
+1,Strasbourg,0,2526
+1,Toulouse,2,1718
+1,Toulouse,0,1819
+1,Toulouse,1,1920
+1,Toulouse,0,2021
+1,Toulouse,1,2122
+1,Toulouse,1,2223
+1,Toulouse,2,2324
+1,Toulouse,0,2425
+1,Toulouse,0,2526
+1,Troyes,0,1819
+1,Troyes,1,1920
+1,Troyes,0,2021
+1,Troyes,1,2122
+1,Troyes,1,2223
+1,Troyes,1,2324
+1,Troyes,2,2425
+1,Troyes,0,2526
+2,Arsenal,2,1718
+2,Arsenal,2,1819
+2,Arsenal,1,1920
+2,Arsenal,1,2021
+2,Arsenal,2,2122
+2,Arsenal,2,2223
+2,Arsenal,1,2324
+2,Arsenal,2,2425
+2,Arsenal,1,2526
+2,Aston Villa,2,2021
+2,Aston Villa,1,2122
+2,Aston Villa,2,2223
+2,Aston Villa,2,2324
+2,Aston Villa,1,2425
+2,Aston Villa,2,2526
+2,Bournemouth,1,1718
+2,Bournemouth,1,1819
+2,Bournemouth,0,1920
+2,Bournemouth,2,2021
+2,Bournemouth,1,2122
+2,Bournemouth,2,2223
+2,Bournemouth,2,2324
+2,Bournemouth,1,2425
+2,Bournemouth,2,2526
+2,Brentford,2,2223
+2,Brentford,2,2324
+2,Brentford,1,2425
+2,Brentford,2,2526
+2,Brighton,1,1819
+2,Brighton,0,1920
+2,Brighton,0,2021
+2,Brighton,1,2122
+2,Brighton,2,2223
+2,Brighton,2,2324
+2,Brighton,1,2425
+2,Brighton,2,2526
+2,Burnley,0,1718
+2,Burnley,1,1819
+2,Burnley,0,1920
+2,Burnley,2,2021
+2,Burnley,1,2122
+2,Burnley,2,2223
+2,Burnley,2,2324
+2,Burnley,1,2425
+2,Burnley,2,2526
+2,Cardiff,0,1920
+2,Cardiff,2,2021
+2,Cardiff,1,2122
+2,Cardiff,2,2223
+2,Cardiff,2,2324
+2,Cardiff,1,2425
+2,Cardiff,2,2526
+2,Chelsea,2,1718
+2,Chelsea,2,1819
+2,Chelsea,2,1920
+2,Chelsea,1,2021
+2,Chelsea,2,2122
+2,Chelsea,1,2223
+2,Chelsea,1,2324
+2,Chelsea,2,2425
+2,Chelsea,1,2526
+2,Crystal Palace,0,1718
+2,Crystal Palace,1,1819
+2,Crystal Palace,1,1920
+2,Crystal Palace,2,2021
+2,Crystal Palace,1,2122
+2,Crystal Palace,2,2223
+2,Crystal Palace,2,2324
+2,Crystal Palace,1,2425
+2,Crystal Palace,2,2526
+2,Everton,0,1718
+2,Everton,1,1819
+2,Everton,1,1920
+2,Everton,0,2021
+2,Everton,1,2122
+2,Everton,2,2223
+2,Everton,2,2324
+2,Everton,1,2425
+2,Everton,2,2526
+2,Fulham,0,1920
+2,Fulham,2,2021
+2,Fulham,0,2122
+2,Fulham,0,2223
+2,Fulham,2,2324
+2,Fulham,1,2425
+2,Fulham,2,2526
+2,Huddersfield,1,1819
+2,Huddersfield,0,1920
+2,Huddersfield,0,2021
+2,Huddersfield,0,2122
+2,Huddersfield,0,2223
+2,Huddersfield,0,2324
+2,Huddersfield,0,2425
+2,Huddersfield,0,2526
+2,Hull,0,1718
+2,Hull,0,1819
+2,Hull,0,1920
+2,Hull,0,2021
+2,Hull,0,2122
+2,Hull,0,2223
+2,Hull,0,2324
+2,Hull,0,2425
+2,Hull,0,2526
+2,Ipswich,0,2526
+2,Leeds,2,2122
+2,Leeds,0,2223
+2,Leeds,2,2324
+2,Leeds,1,2425
+2,Leeds,2,2526
+2,Leicester,0,1718
+2,Leicester,1,1819
+2,Leicester,0,1920
+2,Leicester,0,2021
+2,Leicester,1,2122
+2,Leicester,2,2223
+2,Leicester,2,2324
+2,Leicester,1,2425
+2,Leicester,2,2526
+2,Liverpool,2,1718
+2,Liverpool,2,1819
+2,Liverpool,2,1920
+2,Liverpool,1,2021
+2,Liverpool,2,2122
+2,Liverpool,1,2223
+2,Liverpool,1,2324
+2,Liverpool,2,2425
+2,Liverpool,1,2526
+2,Luton,1,2425
+2,Luton,2,2526
+2,Man City,2,1718
+2,Man City,2,1819
+2,Man City,2,1920
+2,Man City,1,2021
+2,Man City,2,2122
+2,Man City,1,2223
+2,Man City,1,2324
+2,Man City,2,2425
+2,Man City,1,2526
+2,Man United,0,1718
+2,Man United,2,1819
+2,Man United,1,1920
+2,Man United,1,2021
+2,Man United,2,2122
+2,Man United,2,2223
+2,Man United,1,2324
+2,Man United,2,2425
+2,Man United,1,2526
+2,Middlesbrough,0,1718
+2,Middlesbrough,1,1819
+2,Middlesbrough,0,1920
+2,Middlesbrough,2,2021
+2,Middlesbrough,1,2122
+2,Middlesbrough,0,2223
+2,Middlesbrough,2,2324
+2,Middlesbrough,1,2425
+2,Middlesbrough,2,2526
+2,Newcastle,1,1819
+2,Newcastle,0,1920
+2,Newcastle,0,2021
+2,Newcastle,1,2122
+2,Newcastle,2,2223
+2,Newcastle,2,2324
+2,Newcastle,1,2425
+2,Newcastle,2,2526
+2,Norwich,0,2021
+2,Norwich,0,2122
+2,Norwich,0,2223
+2,Norwich,0,2324
+2,Norwich,0,2425
+2,Norwich,0,2526
+2,Nott'm Forest,2,2324
+2,Nott'm Forest,1,2425
+2,Nott'm Forest,2,2526
+2,Sheffield United,2,2021
+2,Sheffield United,1,2122
+2,Sheffield United,0,2223
+2,Sheffield United,2,2324
+2,Sheffield United,0,2425
+2,Sheffield United,0,2526
+2,Southampton,0,1718
+2,Southampton,1,1819
+2,Southampton,1,1920
+2,Southampton,0,2021
+2,Southampton,1,2122
+2,Southampton,2,2223
+2,Southampton,2,2324
+2,Southampton,1,2425
+2,Southampton,2,2526
+2,Stoke,0,1718
+2,Stoke,1,1819
+2,Stoke,0,1920
+2,Stoke,2,2021
+2,Stoke,1,2122
+2,Stoke,0,2223
+2,Stoke,2,2324
+2,Stoke,1,2425
+2,Stoke,2,2526
+2,Sunderland,0,1718
+2,Sunderland,0,1819
+2,Sunderland,0,1920
+2,Sunderland,0,2021
+2,Sunderland,0,2122
+2,Sunderland,0,2223
+2,Sunderland,0,2324
+2,Sunderland,0,2425
+2,Sunderland,0,2526
+2,Swansea,1,1718
+2,Swansea,1,1819
+2,Swansea,0,1920
+2,Swansea,2,2021
+2,Swansea,1,2122
+2,Swansea,2,2223
+2,Swansea,2,2324
+2,Swansea,1,2425
+2,Swansea,2,2526
+2,Tottenham,2,1718
+2,Tottenham,2,1819
+2,Tottenham,2,1920
+2,Tottenham,1,2021
+2,Tottenham,2,2122
+2,Tottenham,2,2223
+2,Tottenham,1,2324
+2,Tottenham,2,2425
+2,Tottenham,1,2526
+2,Watford,0,1718
+2,Watford,0,1819
+2,Watford,0,1920
+2,Watford,0,2021
+2,Watford,0,2122
+2,Watford,0,2223
+2,Watford,0,2324
+2,Watford,0,2425
+2,Watford,0,2526
+2,West Brom,0,1718
+2,West Brom,1,1819
+2,West Brom,1,1920
+2,West Brom,2,2021
+2,West Brom,1,2122
+2,West Brom,0,2223
+2,West Brom,2,2324
+2,West Brom,1,2425
+2,West Brom,2,2526
+2,West Ham,0,1718
+2,West Ham,0,1819
+2,West Ham,0,1920
+2,West Ham,2,2021
+2,West Ham,1,2122
+2,West Ham,2,2223
+2,West Ham,2,2324
+2,West Ham,1,2425
+2,West Ham,2,2526
+2,Wolves,1,1920
+2,Wolves,2,2021
+2,Wolves,1,2122
+2,Wolves,2,2223
+2,Wolves,2,2324
+2,Wolves,1,2425
+2,Wolves,2,2526

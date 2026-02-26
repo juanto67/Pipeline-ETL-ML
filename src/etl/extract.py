@@ -215,30 +215,16 @@ def fetch_matches(output_folder):
                 all_frames.append(normalized)
     if all_frames:
         matches_df = pd.concat(all_frames, ignore_index=True)
-        matches_liga = matches_df[matches_df["league_name"] == "La Liga"].copy()
-        matches_premier = matches_df[matches_df["league_name"] == "Premier League"].copy()
-        matches_france = matches_df[matches_df["league_name"] == "Ligue 1"].copy()
+        
     else:
         matches_df = pd.DataFrame()
         logger.warning("No match data collected from any season or league.")
         return
     merge_and_save(
-        matches_liga,
-        output_folder / "matches_liga.csv",
-        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
-        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
-    )
-    merge_and_save(
-        matches_premier,
-        output_folder / "matches_premier.csv",
-        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
-        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
-    )
-    merge_and_save(
-        matches_france,
-        output_folder / "matches_france.csv",
-        dedupe_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
-        sort_keys=["season_code", "division", "Date", "HomeTeam", "AwayTeam"],
+        matches_df,
+        output_folder / "matches.csv",
+        dedupe_keys=["season_code", "division", "league_name","Date", "HomeTeam", "AwayTeam"],
+        sort_keys=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam"],
     )
 
 

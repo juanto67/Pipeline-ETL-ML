@@ -33,6 +33,26 @@ transform_task = BashOperator(
     bash_command="python /opt/airflow/src/etl/transform.py",
     dag=dag,
 )
+elo_task = BashOperator(
+    task_id="add_elo",
+    bash_command="python /opt/airflow/src/etl/add_elo.py",
+    dag=dag,
+)
+feature_engineering_task = BashOperator(
+    task_id="feature_engineering",
+    bash_command="python /opt/airflow/src/etl/feature_engineering.py",
+    dag=dag,
+)
+clustering_task = BashOperator(
+    task_id="clustering",
+    bash_command="python /opt/airflow/src/etl/clustering.py",
+    dag=dag,
+)
+merge_features_task = BashOperator(
+    task_id="merge_features",
+    bash_command="python /opt/airflow/src/etl/merge_features.py",
+    dag=dag,
+)
 
 load_task = BashOperator(
     task_id="load_data",
@@ -41,4 +61,4 @@ load_task = BashOperator(
 )
 
 
-extract_task >> transform_task >> load_task
+extract_task >> transform_task >> [elo_task, feature_engineering_task, clustering_task] >> merge_features_task >> load_task
