@@ -36,7 +36,7 @@ transform_task = BashOperator(
 )
 elo_task = BashOperator(
     task_id="add_elo",
-    bash_command="python /opt/airflow/src/etl/add_elo.py",
+    bash_command="python /opt/airflow/src/etl/elo.py",
     dag=dag,
 )
 feature_engineering_task = BashOperator(
