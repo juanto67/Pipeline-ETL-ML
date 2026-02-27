@@ -63,25 +63,25 @@ def __main__():
 
     # Merge para equipo local
     df = df.merge(df_clustering, 
-                left_on=['league_id', 'HomeTeam', 'season_code'],
-                right_on=['league_id', 'team', 'season_code'],
-                how='left').rename(columns={'cluster': 'home_cluster'}).drop(columns='team')
+                left_on=["league_id", "HomeTeam", "season_code"],
+                right_on=["league_id", "team", "season_code"],
+                how="left").rename(columns={"cluster": "home_cluster"}).drop(columns="team")
 
     # Merge para equipo visitante
     df = df.merge(df_clustering,
-                left_on=['league_id', 'AwayTeam', 'season_code'],
-                right_on=['league_id', 'team', 'season_code'],
-                how='left').rename(columns={'cluster': 'away_cluster'}).drop(columns='team')
+                left_on=["league_id", "AwayTeam", "season_code"],
+                right_on=["league_id", "team", "season_code"],
+                how="left").rename(columns={"cluster": "away_cluster"}).drop(columns="team")
     df["home_cluster"] = df["home_cluster"].fillna(1).astype(int)
     df["away_cluster"] = df["away_cluster"].fillna(1).astype(int)
 
     df_elo = dfs.get("matches_elo.csv")
     df = df.merge(df_elo,
-                on=['season_code', 'division', 'league_name', 'Date', 'HomeTeam', 'AwayTeam','result','result_ht'],how='left')
+                on=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam","result","result_ht"],how="left")
     df = df.merge(dfs.get("matches_features.csv"), 
-                on=['season_code', 'division', 'league_name', 'Date', 'HomeTeam', 'AwayTeam','result','result_ht'], how='left')
+                on=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam","result","result_ht"], how="left")
     
-    df=df.drop(columns=["result_x","result_ht_x","result_y","result_ht_y"], errors="ignore")
+    
 
     merge_and_save(df, output_folder / "matches_final.csv", dedupe_keys=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam"], sort_keys=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam"])
     logger.info("Loaded matches_final.csv with %d rows", len(df))
