@@ -1,7 +1,7 @@
 venv/
 env/
 .env
-src/airflow/
+src.egg-info/
 objetivo.txt
 Ayudas.md
 __pycache__/
