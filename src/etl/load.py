@@ -141,54 +141,74 @@ def create_power_bi():
     name_where = ["season_code", "division", "date_match", "team_name", "team_name"]
     try:
         for csv_file in csv_files:
-            logger.info("Processing file: %s", csv_file)
-            df = pd.read_csv(csv_file)
-            if df.empty:
+            logger.info("Reading file: %s", csv_file)
+            df_all = pd.read_csv(csv_file)
+            if df_all.empty:
                 logger.warning("No data found in file: %s", csv_file)
                 continue
-            teams = pd.concat([df["HomeTeam"], df["AwayTeam"]]).unique()
-            dim_team = pd.DataFrame({"team_name": teams})
-            dim_season = pd.DataFrame({"season_code": df["season_code"].unique()})
-            dim_division = pd.DataFrame({"division": df["division"].unique()})
-            dim_date = pd.DataFrame({"date_match": df["Date"].unique()})
-            dim_date["day_"] = pd.to_datetime(dim_date["date_match"]).dt.day
-            dim_date["month_"] = pd.to_datetime(dim_date["date_match"]).dt.month
-            dim_date["year_"] = pd.to_datetime(dim_date["date_match"]).dt.year
-            dim_date["week_"] = pd.to_datetime(dim_date["date_match"]).dt.isocalendar().week
-            dim_league = pd.DataFrame({"league_name": df["league_name"].unique()})
-            logger.info("Dataframes for dimensions created for file: %s", csv_file)
-            fact_matches = df.copy()
-            fact_matches.drop(columns=["league_name"], inplace=True)
-            
-            dim_team = cast_dim_types(dim_team, "dim_team")
-            dim_season = cast_dim_types(dim_season, "dim_season")
-            dim_date = cast_dim_types(dim_date, "dim_date")
-            dim_league = cast_dim_types(dim_league, "dim_league")
-            
-            load_data_to_db(conn, dim_team, "dim_team", dim_team.columns.tolist(), ["team_name"])
-            
-            load_data_to_db(conn, dim_season, "dim_season", dim_season.columns.tolist(), ["season_code"])
-            
-            load_data_to_db(conn, dim_date, "dim_date", dim_date.columns.tolist(), ["date_match"])
-            
-            load_data_to_db(conn, dim_league, "dim_league", dim_league.columns.tolist(), ["league_name"])
+
+            if "league_name" not in df_all.columns:
+                logger.error("Missing column league_name in file: %s", csv_file)
+                raise ValueError("Missing column league_name")
+
+            league_names = df_all["league_name"].dropna().unique()
+            if len(league_names) == 0:
+                logger.error("No league_name values found in file: %s", csv_file)
+                raise ValueError("No league_name values found")
+
+            for league_name in league_names:
+                df = df_all[df_all["league_name"] == league_name].copy()
+                if df.empty:
+                    continue
+
+                logger.info("Processing league %s from file: %s", league_name, csv_file)
+
+                teams = pd.concat([df["HomeTeam"], df["AwayTeam"]]).unique()
+                dim_team = pd.DataFrame({"team_name": teams})
+                dim_season = pd.DataFrame({"season_code": df["season_code"].unique()})
+                dim_division = pd.DataFrame({"division": df["division"].unique()})
+                dim_date = pd.DataFrame({"date_match": df["Date"].unique()})
+                dim_date["day_"] = pd.to_datetime(dim_date["date_match"]).dt.day
+                dim_date["month_"] = pd.to_datetime(dim_date["date_match"]).dt.month
+                dim_date["year_"] = pd.to_datetime(dim_date["date_match"]).dt.year
+                dim_date["week_"] = pd.to_datetime(dim_date["date_match"]).dt.isocalendar().week
+                dim_league = pd.DataFrame({"league_name": [league_name]})
+                logger.info("Dataframes for dimensions created for file: %s (league=%s)", csv_file, league_name)
+                fact_matches = df.copy()
+                fact_matches.drop(columns=["league_name"], inplace=True)
+                
+                dim_team = cast_dim_types(dim_team, "dim_team")
+                dim_season = cast_dim_types(dim_season, "dim_season")
+                dim_date = cast_dim_types(dim_date, "dim_date")
+                dim_league = cast_dim_types(dim_league, "dim_league")
+                
+                load_data_to_db(conn, dim_team, "dim_team", dim_team.columns.tolist(), ["team_name"])
+                
+                load_data_to_db(conn, dim_season, "dim_season", dim_season.columns.tolist(), ["season_code"])
+                
+                load_data_to_db(conn, dim_date, "dim_date", dim_date.columns.tolist(), ["date_match"])
+                
+                load_data_to_db(conn, dim_league, "dim_league", dim_league.columns.tolist(), ["league_name"])
     
-            #Get id of league to insert into the division table we have only 1 league in the csv file so we can get the id of the league and insert it into the division table
-            cursor.execute("SELECT d.league_id FROM etl.dim_league d where d.league_name = %s", (df["league_name"].iloc[0],))
+                #Get id of league to insert into the division table
+                cursor.execute(
+                    "SELECT d.league_id FROM etl.dim_league d where d.league_name = %s",
+                    (league_name,),
+                )
             
-            row = cursor.fetchone()
-            if row is None:
-                logger.error("League ID not found for league_name: %s", df["league_name"].iloc[0])
-                raise ValueError("League ID not found")
-            league_id = row[0]
-            dim_division["league_id"] = league_id
-            dim_division = cast_dim_types(dim_division, "dim_division")
-            load_data_to_db(conn, dim_division, "dim_division", dim_division.columns.tolist(), ["division"])
+                row = cursor.fetchone()
+                if row is None:
+                    logger.error("League ID not found for league_name: %s", league_name)
+                    raise ValueError("League ID not found")
+                league_id = row[0]
+                dim_division["league_id"] = league_id
+                dim_division = cast_dim_types(dim_division, "dim_division")
+                load_data_to_db(conn, dim_division, "dim_division", dim_division.columns.tolist(), ["division"])
             
-            fact_matches = change_id(conn, fact_matches, new_cols, old_cols,name_tables,name_where)
-            fact_matches = fact_matches.rename(columns={"result": "result_match"})
-            fact_matches = cast_dim_types(fact_matches, "fact_matches")
-            load_data_to_db(conn, fact_matches, "fact_matches", fact_matches.columns.tolist(), new_cols)
+                fact_matches = change_id(conn, fact_matches, new_cols, old_cols,name_tables,name_where)
+                fact_matches = fact_matches.rename(columns={"result": "result_match"})
+                fact_matches = cast_dim_types(fact_matches, "fact_matches")
+                load_data_to_db(conn, fact_matches, "fact_matches", fact_matches.columns.tolist(), new_cols)
         conn.commit()
     except Exception:
         conn.rollback()
@@ -224,9 +244,50 @@ def __main__():
             .format(sql.Identifier(schema_name), sql.Identifier(table_name))
         )
 
+        # IMPORTANT:
+        # The CSV column order in src/data/final/*.csv is not the same as the table definition order.
+        # COPY without a column list loads by position and will misalign values (e.g., elo_diff can end up in avg_*).
+        # Define the COPY column list to match the CSV order.
+        csv_order_columns = [
+            "season_code",
+            "league_name",
+            "division",
+            "date_match",      # CSV header uses 'Date' but COPY maps by position
+            "hometeam",        # CSV header uses 'HomeTeam'
+            "awayteam",        # CSV header uses 'AwayTeam'
+            "result_match",    # CSV header uses 'result'
+            "result_ht",
+            "league_id",
+            "home_cluster",
+            "away_cluster",
+            "elo",
+            "elo_away",
+            "elo_diff",
+            "avg_home_score_5",
+            "avg_home_score_ht_5",
+            "avg_home_shots_on_target_5",
+            "avg_home_shots_5",
+            "avg_home_corners_5",
+            "avg_home_fouls_5",
+            "avg_home_yellow_5",
+            "avg_home_red_5",
+            "avg_away_score_5",
+            "avg_away_score_ht_5",
+            "avg_away_shots_on_target_5",
+            "avg_away_shots_5",
+            "avg_away_corners_5",
+            "avg_away_fouls_5",
+            "avg_away_yellow_5",
+            "avg_away_red_5",
+        ]
+
         copy_query = sql.SQL(
-            "COPY {}.{} FROM STDIN WITH (FORMAT csv, HEADER true)"
-        ).format(sql.Identifier(schema_name), sql.Identifier(table_name))
+            "COPY {}.{} ({}) FROM STDIN WITH (FORMAT csv, HEADER true)"
+        ).format(
+            sql.Identifier(schema_name),
+            sql.Identifier(table_name),
+            sql.SQL(", ").join(sql.Identifier(c) for c in csv_order_columns),
+        )
 
         for csv_file in csv_files:
             logger.info("Loading %s into %s.%s using COPY", csv_file, schema_name, table_name)
