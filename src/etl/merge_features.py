@@ -20,11 +20,12 @@ def merge_and_save(df, filename, dedupe_keys, sort_keys):
         combined = df
     combined = combined.drop_duplicates(subset=dedupe_keys, keep="last").reset_index(drop=True)
     combined = combined.sort_values(sort_keys).reset_index(drop=True)
-    colums= ["result_ht","result"]
+    colums= ["result_ht","result","home_score","away_score"]
 
     for col in colums:
         if col in combined.columns:
             combined[col] = pd.to_numeric(combined[col], errors="coerce").astype("Int64")
+            
     combined.to_csv(filename, index=False)
     logger.info("Saved %s rows to %s", len(combined), filename) 
 
@@ -53,7 +54,21 @@ def __main__():
         logger.error("No input files found, exiting")
         return
     df = dfs.get("matches_proc.csv")
-    df = df.drop(columns=["home_score", "home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red","away_score", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
+    df = df.drop(columns=["home_score_ht", "home_shots_on_target", "home_shots", "home_corners", "home_fouls", "home_yellow", "home_red", "away_score_ht", "away_shots_on_target", "away_shots", "away_corners", "away_fouls", "away_yellow", "away_red"], errors="ignore")    
+
+    if "home_score" not in df.columns or "away_score" not in df.columns:
+        logger.error("matches_proc.csv must include home_score and away_score")
+        raise ValueError("Missing home_score or away_score in matches_proc.csv")
+
+    merge_keys = ["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam", "result", "result_ht"]
+    score_keys = merge_keys + ["home_score", "away_score"]
+
+    # Preserve scores from matches_proc using key-based merge (not row order).
+    score_source = (
+        df[score_keys]
+        .drop_duplicates(subset=merge_keys, keep="last")
+        .reset_index(drop=True)
+    )
 
     # Añadir league_id igual que en clustering
     if "league_name" in df.columns:
@@ -77,11 +92,14 @@ def __main__():
 
     df_elo = dfs.get("matches_elo.csv")
     df = df.merge(df_elo,
-                on=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam","result","result_ht"],how="left")
+                on=merge_keys,how="left")
     df = df.merge(dfs.get("matches_features.csv"), 
-                on=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam","result","result_ht"], how="left")
-    
-    
+                on=merge_keys, how="left")
+
+    df = df.drop(columns=["home_score", "away_score"], errors="ignore")
+    df = df.merge(score_source, on=merge_keys, how="left")
+    df["home_score"] = df["home_score"].fillna(0).astype("Int64")
+    df["away_score"] = df["away_score"].fillna(0).astype("Int64")
 
     merge_and_save(df, output_folder / "matches_final.csv", dedupe_keys=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam"], sort_keys=["season_code", "division", "league_name", "Date", "HomeTeam", "AwayTeam"])
     logger.info("Loaded matches_final.csv with %d rows", len(df))

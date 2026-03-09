@@ -10,7 +10,7 @@ def get_db_connection():
     db_host = os.getenv("DB_HOST", "localhost")
 
     conn = psycopg2.connect(
-        host=db_host,
+        host="localhost",
         port=os.getenv("DB_PORT", "5432"),
         dbname=os.getenv("POSTGRES_DB", "db_etl"),
         user=os.getenv("POSTGRES_USER", "etl_user"),

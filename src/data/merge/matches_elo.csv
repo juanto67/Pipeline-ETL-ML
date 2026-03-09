@@ -10281,6 +10281,26 @@ season_code,league_name,division,Date,HomeTeam,AwayTeam,result,result_ht,elo,elo
 2526,Premier League,E0,2026-02-22,Sunderland,Fulham,2,1,102.041,91.747,10.294
 2526,Premier League,E0,2026-02-22,Tottenham,Arsenal,2,1,79.103,156.733,-77.63
 2526,Premier League,E0,2026-02-23,Everton,Man United,2,1,103.958,130.446,-26.488
+2526,Premier League,E0,2026-02-27,Wolves,Aston Villa,0,1,24.72,138.584,-113.864
+2526,Premier League,E0,2026-02-28,Bournemouth,Sunderland,1,2,108.908,96.893,12.015
+2526,Premier League,E0,2026-02-28,Burnley,Brentford,2,2,50.614,105.787,-55.173
+2526,Premier League,E0,2026-02-28,Leeds,Man City,2,2,90.837,151.021,-60.184
+2526,Premier League,E0,2026-02-28,Liverpool,West Ham,0,0,120.138,68.996,51.142
+2526,Premier League,E0,2026-02-28,Newcastle,Everton,2,2,94.631,99.338,-4.707
+2526,Premier League,E0,2026-03-01,Arsenal,Chelsea,0,1,160.634,123.874,36.76
+2526,Premier League,E0,2026-03-01,Brighton,Nott'm Forest,0,0,94.932,70.793,24.139
+2526,Premier League,E0,2026-03-01,Fulham,Tottenham,0,0,96.895,75.202,21.693
+2526,Premier League,E0,2026-03-01,Man United,Crystal Palace,0,2,135.066,92.137,42.929
+2526,Premier League,E0,2026-03-03,Bournemouth,Brentford,1,1,108.735,110.0,-1.265
+2526,Premier League,E0,2026-03-03,Everton,Burnley,0,0,104.27,46.401,57.869
+2526,Premier League,E0,2026-03-03,Leeds,Sunderland,2,1,86.695,97.066,-10.371
+2526,Premier League,E0,2026-03-03,Wolves,Liverpool,0,1,31.302,124.407,-93.105
+2526,Premier League,E0,2026-03-04,Aston Villa,Chelsea,2,2,132.002,119.401,12.601
+2526,Premier League,E0,2026-03-04,Brighton,Arsenal,2,2,99.585,165.107,-65.522
+2526,Premier League,E0,2026-03-04,Fulham,West Ham,2,1,101.583,64.727,36.856
+2526,Premier League,E0,2026-03-04,Man City,Nott'm Forest,1,0,155.163,66.14,89.023
+2526,Premier League,E0,2026-03-04,Newcastle,Man United,0,1,89.699,139.451,-49.752
+2526,Premier League,E0,2026-03-05,Tottenham,Crystal Palace,2,2,70.514,87.752,-17.238
 2526,Ligue 1,F1,2025-08-15,Rennes,Marseille,0,1,100.0,100.0,0.0
 2526,Ligue 1,F1,2025-08-16,Lens,Lyon,2,2,100.0,100.0,0.0
 2526,Ligue 1,F1,2025-08-16,Monaco,Le Havre,0,0,100.0,100.0,0.0
@@ -10488,6 +10508,24 @@ season_code,league_name,division,Date,HomeTeam,AwayTeam,result,result_ht,elo,elo
 2526,Ligue 1,F1,2026-02-22,Nantes,Le Havre,0,0,50.962,93.851,-42.889
 2526,Ligue 1,F1,2026-02-22,Nice,Lorient,1,0,77.552,106.57,-29.018
 2526,Ligue 1,F1,2026-02-22,Strasbourg,Lyon,0,0,98.388,138.338,-39.95
+2526,Ligue 1,F1,2026-02-27,Strasbourg,Lens,1,0,103.96,151.379,-47.419
+2526,Ligue 1,F1,2026-02-28,Le Havre,Paris SG,2,2,88.237,159.813,-71.576
+2526,Ligue 1,F1,2026-02-28,Monaco,Angers,0,1,104.2,91.001,13.199
+2526,Ligue 1,F1,2026-02-28,Rennes,Toulouse,0,0,118.162,98.407,19.755
+2526,Ligue 1,F1,2026-03-01,Lille,Nantes,0,1,111.602,56.576,55.026
+2526,Ligue 1,F1,2026-03-01,Lorient,Auxerre,1,1,106.153,58.17,47.983
+2526,Ligue 1,F1,2026-03-01,Marseille,Lyon,0,2,120.067,132.766,-12.699
+2526,Ligue 1,F1,2026-03-01,Metz,Brest,2,1,44.457,98.37,-53.913
+2526,Ligue 1,F1,2026-03-01,Paris FC,Nice,0,0,78.711,77.969,0.742
+2526,Ligue 1,F1,2026-03-06,Paris SG,Monaco,2,2,163.797,109.01,54.787
+2526,Ligue 1,F1,2026-03-07,Auxerre,Strasbourg,1,1,58.856,104.638,-45.782
+2526,Ligue 1,F1,2026-03-07,Nantes,Angers,2,1,52.361,86.191,-33.83
+2526,Ligue 1,F1,2026-03-07,Toulouse,Marseille,2,2,93.691,125.25,-31.559
+2526,Ligue 1,F1,2026-03-08,Brest,Le Havre,0,0,102.6,84.253,18.347
+2526,Ligue 1,F1,2026-03-08,Lens,Metz,0,0,150.701,40.227,110.474
+2526,Ligue 1,F1,2026-03-08,Lille,Lorient,1,1,115.817,105.467,10.35
+2526,Ligue 1,F1,2026-03-08,Lyon,Paris FC,1,1,127.583,83.7,43.883
+2526,Ligue 1,F1,2026-03-08,Nice,Rennes,2,2,72.98,122.878,-49.898
 2526,La Liga,SP1,2025-08-15,Girona,Vallecano,2,2,100.0,100.0,0.0
 2526,La Liga,SP1,2025-08-15,Villarreal,Oviedo,0,0,100.0,100.0,0.0
 2526,La Liga,SP1,2025-08-16,Alaves,Levante,0,0,100.0,100.0,0.0
@@ -10737,3 +10775,23 @@ season_code,league_name,division,Date,HomeTeam,AwayTeam,result,result_ht,elo,elo
 2526,La Liga,SP1,2026-02-22,Getafe,Sevilla,2,1,87.407,77.087,10.32
 2526,La Liga,SP1,2026-02-22,Villarreal,Valencia,0,0,137.287,84.915,52.372
 2526,La Liga,SP1,2026-02-23,Alaves,Girona,1,1,78.526,95.222,-16.696
+2526,La Liga,SP1,2026-02-27,Levante,Alaves,0,1,54.326,78.766,-24.44
+2526,La Liga,SP1,2026-02-28,Barcelona,Villarreal,0,0,166.565,141.539,25.026
+2526,La Liga,SP1,2026-02-28,Mallorca,Sociedad,2,2,70.848,98.583,-27.735
+2526,La Liga,SP1,2026-02-28,Oviedo,Ath Madrid,2,1,58.376,135.781,-77.405
+2526,La Liga,SP1,2026-02-28,Vallecano,Ath Bilbao,1,0,84.174,94.598,-10.424
+2526,La Liga,SP1,2026-03-01,Betis,Sevilla,1,0,126.05,82.235,43.815
+2526,La Liga,SP1,2026-03-01,Elche,Espanol,1,1,75.16,96.701,-21.541
+2526,La Liga,SP1,2026-03-01,Girona,Celta,2,0,94.982,112.977,-17.995
+2526,La Liga,SP1,2026-03-01,Valencia,Osasuna,0,1,80.663,99.211,-18.548
+2526,La Liga,SP1,2026-03-02,Real Madrid,Getafe,2,2,166.206,82.259,83.947
+2526,La Liga,SP1,2026-03-04,Vallecano,Oviedo,0,0,84.324,54.472,29.852
+2526,La Liga,SP1,2026-03-06,Celta,Real Madrid,2,1,117.718,160.021,-42.303
+2526,La Liga,SP1,2026-03-07,Ath Bilbao,Barcelona,2,1,94.448,171.205,-76.757
+2526,La Liga,SP1,2026-03-07,Ath Madrid,Sociedad,0,1,139.685,103.185,36.5
+2526,La Liga,SP1,2026-03-07,Levante,Girona,1,1,59.677,90.241,-30.564
+2526,La Liga,SP1,2026-03-07,Osasuna,Mallorca,1,2,93.944,66.246,27.698
+2526,La Liga,SP1,2026-03-08,Getafe,Betis,0,0,88.444,125.423,-36.979
+2526,La Liga,SP1,2026-03-08,Sevilla,Vallecano,1,0,82.862,88.895,-6.033
+2526,La Liga,SP1,2026-03-08,Valencia,Alaves,0,2,85.93,73.415,12.515
+2526,La Liga,SP1,2026-03-08,Villarreal,Elche,0,0,136.899,75.47,61.429
