@@ -279,6 +279,8 @@ def __main__():
             "avg_away_fouls_5",
             "avg_away_yellow_5",
             "avg_away_red_5",
+            "home_score",
+            "away_score",
         ]
 
         copy_query = sql.SQL(
